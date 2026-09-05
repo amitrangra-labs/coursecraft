@@ -1,0 +1,64 @@
+# Roadmap
+
+Milestone-based, each phase independently demoable. Journeys referenced by their IDs from
+[USER_JOURNEYS.md](USER_JOURNEYS.md).
+
+## Phase 0 — Foundations (repo & skeleton)
+
+- [ ] Backend skeleton: hexagonal layout, `Application`, 3 config classes, health endpoint.
+- [ ] PostgreSQL + `schema.sql`, `JdbcClient` wiring, migration baseline.
+- [ ] OIDC integration; issue/verify JWT; `learner` role default.
+- [ ] Android app skeleton: Compose, navigation, auth sign-in (LJ sign-in, CJ-1).
+- [ ] CI: build + test for backend and Android.
+
+**Demo:** sign in on Android, hit an authenticated backend endpoint.
+
+## Phase 1 — Creator authoring (video pipeline)
+
+- [ ] Course/section/lecture CRUD (CJ-2).
+- [ ] Video provider integration: direct-upload URL + `asset.ready` webhook (CJ-3).
+- [ ] Creator studio screens: create course, add lecture, upload with progress, publish (CJ-5).
+
+**Demo:** a teacher creates and publishes a course with a playable video lecture.
+
+## Phase 2 — Learner core: watch + resume  ⭐
+
+- [ ] Discovery + enroll (LJ-1).
+- [ ] Media3 player with signed HLS playback (LJ-2).
+- [ ] Progress upsert API + throttled client writes + Room offline queue + WorkManager sync.
+- [ ] "Continue learning" rail; resume-at-position (LJ-3).
+
+**Demo:** watch a lecture, kill the app, reopen → resumes at the exact position.
+
+## Phase 3 — Assessments + leaderboards  ⭐
+
+- [ ] Assessment authoring: single/multiple/true-false questions (CJ-4).
+- [ ] Attempt lifecycle with server-side grading, attempt limits, timer (LJ-4).
+- [ ] Result screen; best-per-learner leaderboard, assessment + course scope (LJ-5).
+- [ ] Course completion + badge (LJ-6).
+
+**Demo:** two learners take the same assessment and see their ranks on a shared leaderboard.
+
+## Phase 4 — Polish & MVP hardening
+
+- [ ] Creator analytics dashboard (CJ-6).
+- [ ] Profile + display name / anonymous leaderboard option.
+- [ ] Error/empty/loading states, accessibility, offline messaging.
+- [ ] Observability: metrics + structured logs; basic load test on leaderboard/progress.
+
+**MVP done** = Phases 0–4 on Android.
+
+## Phase 5+ — Beyond MVP
+
+- iOS (SwiftUI) client over the same API.
+- Web (React) client.
+- Full offline lecture download; push notifications (FCM); ratings & reviews;
+  free-text/AI-graded questions; certificates; payments; cohorts/friends leaderboards;
+  moderation.
+
+## Suggested build order rationale
+
+Authoring (Phase 1) comes before learner features because you need real courses and videos to
+test watching, progress, and assessments. The two ⭐ phases (2 and 3) are the product's
+differentiators — **resume-anywhere progress** and **competitive scoring** — so they get
+dedicated phases rather than being folded into a generic "learner" milestone.

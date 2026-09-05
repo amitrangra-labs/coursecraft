@@ -1,0 +1,16 @@
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Build (added when code lands)
+target/
+build/
+*.apk
+local.properties
+.gradle/
+
+# Secrets
+.env
+*.local
