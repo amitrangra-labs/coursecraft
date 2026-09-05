@@ -22,16 +22,18 @@ themselves against peers.
 | Doc | What it covers |
 | --- | --- |
 | [docs/USER_JOURNEYS.md](docs/USER_JOURNEYS.md) | Every creator & learner journey, with mermaid flow/sequence diagrams. **Start here.** |
+| [docs/STACK.md](docs/STACK.md) | The chosen **$0 nonprofit stack** — what we build vs. what Supabase manages, and cost. |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture, domain model, tech stack, video pipeline, hexagonal backend. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phased, milestone-based delivery plan (MVP → v1 → multi-platform). |
 
-## High-level stack (recommendation)
+## High-level stack (chosen — $0 to run)
+
+Built to run at **$0/month** for a nonprofit. Full detail and cost table in [docs/STACK.md](docs/STACK.md).
 
 - **Android app:** Kotlin + Jetpack Compose, MVVM + unidirectional data flow, Media3/ExoPlayer for video.
-- **Backend:** Spring Boot (Java), **strict hexagonal** — `domain` / `port` / `adapter/in` / `adapter/out`, explicit bean wiring in `@Configuration` classes, `JdbcClient` + `schema.sql` (no JPA magic).
-- **Video:** managed streaming provider (Mux or Cloudflare Stream) for upload → transcode → HLS + signed playback URLs, so we never build a transcoding pipeline ourselves.
-- **Data:** PostgreSQL for domain data; object storage (S3/R2) for raw uploads and assets.
-- **Auth:** OIDC (Auth0/Keycloak/Cognito) with `creator` and `learner` roles.
+- **Our backend:** Spring Boot (Java), **strict hexagonal** — `domain` / `port` / `adapter/in` / `adapter/out`, explicit bean wiring in `@Configuration` classes, `JdbcClient` + `schema.sql` (no JPA magic). Hosted free (Render/Fly.io). Owns grading, leaderboards, publish rules, progress upserts.
+- **Supabase (free, managed):** PostgreSQL (our schema), Auth (JWT, `learner`/`creator` roles), and Storage for thumbnails — so we don't operate a database.
+- **Video:** **YouTube/Vimeo unlisted embeds** — free hosting + delivery; we store only the video id. (Upgrade path to signed streaming via nonprofit credits if lectures ever need gating.)
 - **Later:** iOS (SwiftUI) + Web (React) reuse the same backend API. See ARCHITECTURE for the cross-platform decision.
 
 ## Rationale for Android-native first

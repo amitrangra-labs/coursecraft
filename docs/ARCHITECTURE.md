@@ -3,6 +3,13 @@
 Design follows the journeys in [USER_JOURNEYS.md](USER_JOURNEYS.md). Modules exist to serve
 those flows.
 
+> **Chosen realization:** this document describes the general shape (client-agnostic API,
+> hexagonal backend, external auth + video). The concrete **$0 nonprofit stack we're building
+> on** — Supabase for Postgres/Auth/Storage, YouTube/Vimeo for video, free backend hosting —
+> is specified in [STACK.md](STACK.md). Where this doc says "video provider (Mux/CF Stream)"
+> or "object storage (S3/R2)", read it as **YouTube/Vimeo** and **Supabase Storage** for the
+> MVP; the module boundaries are identical, only the adapter behind the port changes.
+
 ## System context
 
 ```mermaid
