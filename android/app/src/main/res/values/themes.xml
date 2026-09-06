@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Minimal platform theme (no Material Components / AppCompat dependency). Compose supplies
+         the real Material 3 theming, including light/dark, at runtime. -->
+    <style name="Theme.CourseCraft" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

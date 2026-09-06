@@ -6,8 +6,10 @@ take assessments, and see how their scores stack up against other learners.
 
 Target platforms, in order: **Android first → iOS → Web.**
 
-> Status: **Planning.** No application code yet. This repo currently holds the development
-> plan and the user journeys that drive the design. See [`docs/`](docs/).
+> Status: **Phase 0 in progress.** Plan complete (see [`docs/`](docs/)) plus initial code:
+> [`backend/`](backend/) — hexagonal Spring Boot skeleton with JWT auth + profile provisioning
+> (built & tested, 8 tests green); [`android/`](android/) — Compose app skeleton + the signed-APK
+> release pipeline (built in CI). See [docs/ROADMAP.md](docs/ROADMAP.md) for what's next.
 
 ## The idea in one paragraph
 

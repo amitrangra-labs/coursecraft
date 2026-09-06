@@ -5,12 +5,13 @@ Milestone-based, each phase independently demoable. Journeys referenced by their
 
 ## Phase 0 — Foundations (repo & skeleton)
 
-- [ ] Backend skeleton: hexagonal layout, `Application`, 3 config classes, health endpoint.
-- [ ] PostgreSQL + `schema.sql`, `JdbcClient` wiring, migration baseline.
-- [ ] OIDC integration; issue/verify JWT; `learner` role default.
-- [ ] Android app skeleton: Compose, navigation, auth sign-in (LJ sign-in, CJ-1).
-- [ ] CI: build + test for backend and Android.
-- [ ] **Signed universal release APK** produced by CI and attached to a **GitHub Release**,
+- [x] Backend skeleton: hexagonal layout, `Application`, 3 config classes, health endpoint.
+- [x] PostgreSQL + `schema.sql`, `JdbcClient` wiring (`app_user` baseline).
+- [x] JWT verify against Supabase JWKS; `learner` role default + creator upgrade; JIT provisioning.
+- [~] Android app skeleton: Compose home screen + backend health check. (Supabase sign-in +
+      navigation still to wire.)
+- [x] CI: build + test for backend and Android.
+- [x] **Signed universal release APK** produced by CI and attached to a **GitHub Release**,
       with published SHA-256 + signing-cert fingerprints (release keystore in Actions
       secrets). This is the MVP distribution channel — see [DISTRIBUTION.md](DISTRIBUTION.md).
 
