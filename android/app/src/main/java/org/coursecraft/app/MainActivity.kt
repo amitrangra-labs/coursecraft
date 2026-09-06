@@ -79,6 +79,14 @@ fun CourseCraftApp() {
             onBack = { back() }
         )
 
+        Screen.MyLearning -> CourseListScreen(
+            title = "My Learning",
+            emptyText = "You haven't enrolled in any courses yet.",
+            loader = { CourseApi.myLearning(token) },
+            onOpen = { navigate(Screen.CourseDetail(it.id, it.title)) },
+            onBack = { back() }
+        )
+
         Screen.MyCourses -> CourseListScreen(
             title = "My courses",
             emptyText = "You haven't created any courses yet.",

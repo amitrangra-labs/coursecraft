@@ -70,6 +70,9 @@ fun HomeScreen(
         Button(onClick = { onNavigate(Screen.Catalog) }, modifier = Modifier.fillMaxWidth()) {
             Text("Browse courses")
         }
+        Button(onClick = { onNavigate(Screen.MyLearning) }, modifier = Modifier.fillMaxWidth()) {
+            Text("My Learning")
+        }
 
         if (role == "CREATOR") {
             Button(onClick = { onNavigate(Screen.MyCourses) }, modifier = Modifier.fillMaxWidth()) {

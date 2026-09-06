@@ -96,7 +96,18 @@ object CourseApi {
         val sections = json.getJSONArray("sections").let { arr ->
             (0 until arr.length()).map { parseSection(arr.getJSONObject(it)) }
         }
-        return CourseDetailView(course, sections)
+        return CourseDetailView(course, sections, json.optBoolean("enrolled"))
+    }
+
+    suspend fun myLearning(token: String): List<CourseSummary> =
+        parseCourseList(request("GET", "/api/my/learning", token, null))
+
+    suspend fun enroll(token: String, courseId: String) {
+        request("POST", "/api/courses/$courseId/enroll", token, null)
+    }
+
+    suspend fun unenroll(token: String, courseId: String) {
+        request("DELETE", "/api/courses/$courseId/enroll", token, null)
     }
 
     // --- HTTP ---

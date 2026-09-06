@@ -28,5 +28,6 @@ data class SectionView(
 
 data class CourseDetailView(
     val course: CourseSummary,
-    val sections: List<SectionView>
+    val sections: List<SectionView>,
+    val enrolled: Boolean
 )

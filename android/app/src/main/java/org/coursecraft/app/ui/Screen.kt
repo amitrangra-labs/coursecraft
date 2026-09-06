@@ -4,6 +4,7 @@ package org.coursecraft.app.ui
 sealed interface Screen {
     data object Home : Screen
     data object Catalog : Screen
+    data object MyLearning : Screen
     data object MyCourses : Screen
     data object CreateCourse : Screen
     data class CourseDetail(val courseId: String, val title: String) : Screen

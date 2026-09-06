@@ -7,23 +7,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.coursecraft.app.data.CourseApi
 import org.coursecraft.app.data.CourseDetailView
 import org.coursecraft.app.data.LectureView
 
-/** Learner course detail: sections + lectures; tap a video lecture to play it (journey LJ-1/LJ-2). */
+/** Learner course detail: enroll/unenroll, sections + lectures; tap a lecture to play (LJ-1/LJ-2). */
 @Composable
 fun CourseDetailScreen(
     accessToken: String,
@@ -32,14 +36,32 @@ fun CourseDetailScreen(
     onPlay: (LectureView) -> Unit,
     onBack: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     var detail by remember { mutableStateOf<CourseDetailView?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+    var reloadKey by remember { mutableStateOf(0) }
+    var busy by remember { mutableStateOf(false) }
 
-    LaunchedEffect(courseId) {
+    LaunchedEffect(reloadKey) {
         detail = try {
             CourseApi.courseDetail(accessToken, courseId)
         } catch (e: Exception) {
             error = e.message; null
+        }
+    }
+
+    fun toggleEnroll(currentlyEnrolled: Boolean) {
+        busy = true; error = null
+        scope.launch {
+            try {
+                if (currentlyEnrolled) CourseApi.unenroll(accessToken, courseId)
+                else CourseApi.enroll(accessToken, courseId)
+                reloadKey++
+            } catch (e: Exception) {
+                error = e.message
+            } finally {
+                busy = false
+            }
         }
     }
 
@@ -48,24 +70,35 @@ fun CourseDetailScreen(
         when {
             error != null -> Text(error!!, color = MaterialTheme.colorScheme.error)
             detail == null -> CircularProgressIndicator()
-            else -> detail!!.sections.forEach { section ->
-                Text(
-                    section.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-                section.lectures.forEach { lecture ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable(enabled = lecture.videoId != null) { onPlay(lecture) }
-                    ) {
-                        Text(
-                            "▶  ${lecture.title}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(16.dp)
-                        )
+            else -> {
+                val d = detail!!
+                if (d.enrolled) {
+                    OutlinedButton(onClick = { toggleEnroll(true) }, enabled = !busy,
+                        modifier = Modifier.fillMaxWidth()) { Text("Enrolled ✓  —  Unenroll") }
+                } else {
+                    Button(onClick = { toggleEnroll(false) }, enabled = !busy,
+                        modifier = Modifier.fillMaxWidth()) { Text("Enroll") }
+                }
+
+                d.sections.forEach { section ->
+                    Text(
+                        section.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    section.lectures.forEach { lecture ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable(enabled = lecture.videoId != null) { onPlay(lecture) }
+                        ) {
+                            Text(
+                                "▶  ${lecture.title}",
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
                 }
             }
