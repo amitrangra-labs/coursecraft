@@ -44,3 +44,7 @@ data class ContinueItem(
     val videoId: String,
     val positionSec: Int
 )
+
+data class AssessmentStat(val title: String, val attempts: Int, val averagePercent: Int)
+
+data class CourseAnalytics(val enrollments: Int, val assessments: List<AssessmentStat>)

@@ -1,5 +1,6 @@
 package com.coursecraft.domain.config;
 
+import com.coursecraft.domain.service.AnalyticsService;
 import com.coursecraft.domain.service.AssessmentService;
 import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.EnrollmentService;
@@ -51,5 +52,11 @@ public class DomainConfig {
     @Bean
     LiveSessionService liveSessionService(LiveSessionStore liveSessionStore, CourseStore courseStore) {
         return new LiveSessionService(liveSessionStore, courseStore);
+    }
+
+    @Bean
+    AnalyticsService analyticsService(CourseStore courseStore, EnrollmentStore enrollmentStore,
+                                      AssessmentStore assessmentStore) {
+        return new AnalyticsService(courseStore, enrollmentStore, assessmentStore);
     }
 }

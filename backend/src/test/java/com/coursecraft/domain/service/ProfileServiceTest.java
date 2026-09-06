@@ -91,6 +91,14 @@ class ProfileServiceTest {
             return promoted;
         }
 
+        @Override
+        public User updateDisplayName(UUID id, String displayName) {
+            User u = byId.get(id);
+            User renamed = new User(u.id(), u.subject(), u.email(), displayName, u.role(), u.createdAt());
+            save(renamed);
+            return renamed;
+        }
+
         private void save(User u) {
             bySubject.put(u.subject(), u);
             byId.put(u.id(), u);

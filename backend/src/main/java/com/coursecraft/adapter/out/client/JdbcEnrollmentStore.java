@@ -66,6 +66,14 @@ public final class JdbcEnrollmentStore implements EnrollmentStore {
                 .list();
     }
 
+    @Override
+    public long countByCourse(UUID courseId) {
+        return jdbc.sql("SELECT count(*) FROM enrollment WHERE course_id = :courseId")
+                .param("courseId", courseId)
+                .query(Long.class)
+                .single();
+    }
+
     private static Course mapCourse(ResultSet rs, int rowNum) throws SQLException {
         return new Course(
                 rs.getObject("id", UUID.class),

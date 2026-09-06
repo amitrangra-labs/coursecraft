@@ -39,6 +39,11 @@ public final class InMemoryEnrollmentStore implements EnrollmentStore {
     }
 
     @Override
+    public long countByCourse(UUID courseId) {
+        return enrollments.stream().filter(k -> k.course().equals(courseId)).count();
+    }
+
+    @Override
     public List<Course> listEnrolledCourses(UUID learnerId) {
         List<Course> out = new ArrayList<>();
         for (Key k : enrollments) {

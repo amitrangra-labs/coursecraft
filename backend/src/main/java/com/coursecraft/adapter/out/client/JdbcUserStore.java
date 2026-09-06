@@ -69,6 +69,16 @@ public final class JdbcUserStore implements UserStore {
                 .orElseThrow(() -> new IllegalStateException("no user " + id));
     }
 
+    @Override
+    public User updateDisplayName(UUID id, String displayName) {
+        jdbc.sql("UPDATE app_user SET display_name = :displayName WHERE id = :id")
+                .param("displayName", displayName)
+                .param("id", id)
+                .update();
+        return findById(id)
+                .orElseThrow(() -> new IllegalStateException("no user " + id));
+    }
+
     private static String deriveDisplayName(String email) {
         if (email == null || email.isBlank()) {
             return "Learner";

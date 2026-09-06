@@ -34,4 +34,7 @@ public interface AssessmentStore {
 
     /** Best score per learner, highest first (ties broken by earliest submission). */
     List<LeaderboardRow> leaderboard(UUID assessmentId);
+
+    /** {@code [attemptCount, averagePercent]} across all attempts of an assessment. */
+    long[] attemptStats(UUID assessmentId);
 }

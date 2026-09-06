@@ -24,4 +24,7 @@ public interface UserStore {
 
     /** Upgrade a user to {@code CREATOR} (journey CJ-1). */
     User promoteToCreator(UUID id);
+
+    /** Update the display name shown on leaderboards. */
+    User updateDisplayName(UUID id, String displayName);
 }

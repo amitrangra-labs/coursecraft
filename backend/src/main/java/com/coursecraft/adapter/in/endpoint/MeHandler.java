@@ -33,6 +33,17 @@ public final class MeHandler {
         return ServerResponse.ok().body(ProfileResponse.from(creator));
     }
 
+    public ServerResponse updateDisplayName(ServerRequest request) throws Exception {
+        VerifiedToken token = RequestAuth.tokenOf(request);
+        User user = profileService.getOrProvision(token);
+        DisplayNameRequest body = request.body(DisplayNameRequest.class);
+        User updated = profileService.updateDisplayName(user.id(), body.displayName());
+        return ServerResponse.ok().body(ProfileResponse.from(updated));
+    }
+
+    public record DisplayNameRequest(String displayName) {
+    }
+
     /** Outbound view — never leaks the internal subject beyond what the client needs. */
     public record ProfileResponse(String id, String email, String displayName, String role) {
         static ProfileResponse from(User user) {

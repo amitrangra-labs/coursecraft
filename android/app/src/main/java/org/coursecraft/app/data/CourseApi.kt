@@ -127,6 +127,22 @@ object CourseApi {
         return CourseProgress(o.optInt("percent"), o.optInt("completed"), o.optInt("total"))
     }
 
+    suspend fun updateDisplayName(token: String, displayName: String) {
+        val body = JSONObject().put("displayName", displayName)
+        request("PUT", "/api/me/display-name", token, body)
+    }
+
+    suspend fun courseAnalytics(token: String, courseId: String): CourseAnalytics {
+        val o = JSONObject(request("GET", "/api/courses/$courseId/analytics", token, null))
+        val stats = o.getJSONArray("assessments").let { arr ->
+            (0 until arr.length()).map {
+                val a = arr.getJSONObject(it)
+                AssessmentStat(a.getString("title"), a.optInt("attempts"), a.optInt("averagePercent"))
+            }
+        }
+        return CourseAnalytics(o.optInt("enrollments"), stats)
+    }
+
     suspend fun continueLearning(token: String): ContinueItem? {
         val o = JSONObject(request("GET", "/api/my/continue", token, null))
         if (o.optBoolean("none")) return null

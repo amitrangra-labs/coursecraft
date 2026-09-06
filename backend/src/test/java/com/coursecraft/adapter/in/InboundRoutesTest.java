@@ -4,6 +4,7 @@ import com.coursecraft.adapter.in.config.InboundConfig;
 import com.coursecraft.domain.object.Role;
 import com.coursecraft.domain.object.User;
 import com.coursecraft.domain.object.VerifiedToken;
+import com.coursecraft.domain.service.AnalyticsService;
 import com.coursecraft.domain.service.AssessmentService;
 import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.EnrollmentService;
@@ -138,6 +139,12 @@ class InboundRoutesTest {
         }
 
         @Bean
+        AnalyticsService analyticsService(CourseStore courseStore) {
+            return new AnalyticsService(courseStore, new InMemoryEnrollmentStore(courseStore),
+                    new InMemoryAssessmentStore());
+        }
+
+        @Bean
         UserStore userStore() {
             return new InMemoryUserStore();
         }
@@ -189,6 +196,15 @@ class InboundRoutesTest {
             bySubject.put(promoted.subject(), promoted);
             byId.put(promoted.id(), promoted);
             return promoted;
+        }
+
+        @Override
+        public User updateDisplayName(UUID id, String displayName) {
+            User u = byId.get(id);
+            User renamed = new User(u.id(), u.subject(), u.email(), displayName, u.role(), u.createdAt());
+            bySubject.put(renamed.subject(), renamed);
+            byId.put(renamed.id(), renamed);
+            return renamed;
         }
     }
 }

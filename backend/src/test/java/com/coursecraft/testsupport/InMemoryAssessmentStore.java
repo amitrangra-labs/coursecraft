@@ -77,6 +77,19 @@ public final class InMemoryAssessmentStore implements AssessmentStore {
     }
 
     @Override
+    public long[] attemptStats(UUID assessmentId) {
+        List<Attempt> forAssessment = attempts.stream()
+                .filter(a -> a.assessmentId().equals(assessmentId)).toList();
+        if (forAssessment.isEmpty()) {
+            return new long[]{0, 0};
+        }
+        double avg = forAssessment.stream()
+                .mapToDouble(a -> a.maxScore() > 0 ? a.score() * 100.0 / a.maxScore() : 0)
+                .average().orElse(0);
+        return new long[]{forAssessment.size(), Math.round(avg)};
+    }
+
+    @Override
     public List<LeaderboardRow> leaderboard(UUID assessmentId) {
         Map<UUID, Attempt> bestByLearner = new LinkedHashMap<>();
         for (Attempt a : attempts) {

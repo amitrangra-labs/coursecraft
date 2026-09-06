@@ -17,4 +17,6 @@ public interface EnrollmentStore {
 
     /** Published courses the learner is enrolled in, most recent first. */
     List<Course> listEnrolledCourses(UUID learnerId);
+
+    long countByCourse(UUID courseId);
 }

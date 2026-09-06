@@ -21,4 +21,7 @@ sealed interface Screen {
     // Live lectures (Phase 3.5)
     data class CreatorLive(val courseId: String, val title: String) : Screen
     data class LearnerLive(val courseId: String, val title: String) : Screen
+
+    // Analytics (Phase 4)
+    data class Analytics(val courseId: String, val title: String) : Screen
 }

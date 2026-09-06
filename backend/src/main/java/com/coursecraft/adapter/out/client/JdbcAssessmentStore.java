@@ -140,6 +140,19 @@ public final class JdbcAssessmentStore implements AssessmentStore {
                 .list();
     }
 
+    @Override
+    public long[] attemptStats(UUID assessmentId) {
+        return jdbc.sql("""
+                        SELECT count(*) AS attempts,
+                               COALESCE(round(avg(CASE WHEN max_score > 0
+                                    THEN score * 100.0 / max_score ELSE 0 END)), 0) AS avg_percent
+                        FROM attempt WHERE assessment_id = :assessmentId
+                        """)
+                .param("assessmentId", assessmentId)
+                .query((rs, n) -> new long[]{rs.getLong("attempts"), rs.getLong("avg_percent")})
+                .single();
+    }
+
     private static Assessment mapAssessment(ResultSet rs, int n) throws SQLException {
         return new Assessment(rs.getObject("id", UUID.class), rs.getObject("course_id", UUID.class),
                 rs.getString("title"), rs.getInt("pass_mark"),

@@ -33,4 +33,14 @@ public final class ProfileService {
                 .orElseThrow(() -> new NoSuchElementException("No user " + userId));
         return userStore.promoteToCreator(user.id());
     }
+
+    /** Rename the caller (feeds the leaderboard display). */
+    public User updateDisplayName(UUID userId, String displayName) {
+        String clean = displayName == null ? "" : displayName.trim();
+        if (clean.isEmpty()) {
+            throw new IllegalArgumentException("displayName is required");
+        }
+        return userStore.updateDisplayName(userId, clean);
+    }
 }
+

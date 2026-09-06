@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.coursecraft.app.ui.AddQuestionScreen
+import org.coursecraft.app.ui.AnalyticsScreen
 import org.coursecraft.app.ui.CourseDetailScreen
 import org.coursecraft.app.ui.CourseListScreen
 import org.coursecraft.app.ui.CreateCourseScreen
@@ -127,6 +128,7 @@ fun CourseCraftApp() {
             title = screen.title,
             onOpenAssessments = { navigate(Screen.CreatorAssessments(screen.courseId, screen.title)) },
             onOpenLive = { navigate(Screen.CreatorLive(screen.courseId, screen.title)) },
+            onOpenAnalytics = { navigate(Screen.Analytics(screen.courseId, screen.title)) },
             onDeleted = { back() },
             onBack = { back() }
         )
@@ -191,6 +193,13 @@ fun CourseCraftApp() {
             courseId = screen.courseId,
             title = screen.title,
             onOpenVideo = { navigate(Screen.Player(it.videoId, it.title, "")) },
+            onBack = { back() }
+        )
+
+        is Screen.Analytics -> AnalyticsScreen(
+            accessToken = token,
+            courseId = screen.courseId,
+            title = screen.title,
             onBack = { back() }
         )
     }

@@ -42,6 +42,7 @@ fun HomeScreen(
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var continueItem by remember { mutableStateOf<org.coursecraft.app.data.ContinueItem?>(null) }
+    var editingName by remember { mutableStateOf(false) }
 
     LaunchedEffect(accessToken) {
         try {
@@ -72,6 +73,7 @@ fun HomeScreen(
 
         Text("Hi, $displayName", style = MaterialTheme.typography.headlineSmall)
         Text("Role: ${role ?: "?"}", style = MaterialTheme.typography.bodyMedium)
+        androidx.compose.material3.TextButton(onClick = { editingName = true }) { Text("Edit name") }
 
         continueItem?.let { c ->
             Button(
@@ -123,5 +125,38 @@ fun HomeScreen(
         error?.let {
             Text(it, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
         }
+    }
+
+    if (editingName) {
+        var newName by remember { mutableStateOf(displayName) }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { editingName = false },
+            title = { Text("Edit display name") },
+            text = {
+                androidx.compose.material3.OutlinedTextField(
+                    newName, { newName = it }, singleLine = true,
+                    label = { Text("Display name") })
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    enabled = newName.isNotBlank(),
+                    onClick = {
+                        val n = newName.trim()
+                        editingName = false
+                        scope.launch {
+                            try {
+                                CourseApi.updateDisplayName(accessToken, n)
+                                displayName = n
+                            } catch (e: Exception) {
+                                error = e.message
+                            }
+                        }
+                    }
+                ) { Text("Save") }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { editingName = false }) { Text("Cancel") }
+            }
+        )
     }
 }
