@@ -1,0 +1,15 @@
+# Local convenience only — a Postgres to develop against. Production uses Supabase.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: coursecraft
+      POSTGRES_USER: coursecraft
+      POSTGRES_PASSWORD: coursecraft
+    ports:
+      - "5432:5432"
+    volumes:
+      - coursecraft_pg:/var/lib/postgresql/data
+
+volumes:
+  coursecraft_pg:
