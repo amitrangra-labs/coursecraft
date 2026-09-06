@@ -23,6 +23,7 @@ themselves against peers.
 | --- | --- |
 | [docs/USER_JOURNEYS.md](docs/USER_JOURNEYS.md) | Every creator & learner journey, with mermaid flow/sequence diagrams. **Start here.** |
 | [docs/STACK.md](docs/STACK.md) | The chosen **$0 nonprofit stack** — what we build vs. what Supabase manages, and cost. |
+| [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) | How we publish Android & iOS and host the web app, with nonprofit fee waivers and costs. |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture, domain model, tech stack, video pipeline, hexagonal backend. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phased, milestone-based delivery plan (MVP → v1 → multi-platform). |
 
