@@ -1,6 +1,8 @@
 package com.coursecraft.domain.config;
 
+import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.ProfileService;
+import com.coursecraft.port.CourseStore;
 import com.coursecraft.port.UserStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,5 +18,10 @@ public class DomainConfig {
     @Bean
     ProfileService profileService(UserStore userStore) {
         return new ProfileService(userStore);
+    }
+
+    @Bean
+    CourseService courseService(CourseStore courseStore) {
+        return new CourseService(courseStore);
     }
 }

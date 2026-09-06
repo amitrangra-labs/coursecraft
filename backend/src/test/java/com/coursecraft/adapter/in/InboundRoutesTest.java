@@ -4,9 +4,11 @@ import com.coursecraft.adapter.in.config.InboundConfig;
 import com.coursecraft.domain.object.Role;
 import com.coursecraft.domain.object.User;
 import com.coursecraft.domain.object.VerifiedToken;
+import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.ProfileService;
 import com.coursecraft.port.TokenVerifier;
 import com.coursecraft.port.UserStore;
+import com.coursecraft.testsupport.InMemoryCourseStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -74,11 +76,31 @@ class InboundRoutesTest {
                 .andExpect(jsonPath("$.role").value("CREATOR"));
     }
 
+    @Test
+    void catalog_authenticated_returnsList() throws Exception {
+        mvc.perform(get("/api/catalog").header("Authorization", "Bearer good"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void createCourse_asLearner_is403() throws Exception {
+        mvc.perform(post("/api/courses")
+                        .header("Authorization", "Bearer good")
+                        .contentType("application/json")
+                        .content("{\"title\":\"Algebra\"}"))
+                .andExpect(status().isForbidden());
+    }
+
     @TestConfiguration(proxyBeanMethods = false)
     static class Fakes {
         @Bean
         ProfileService profileService(UserStore userStore) {
             return new ProfileService(userStore);
+        }
+
+        @Bean
+        CourseService courseService() {
+            return new CourseService(new InMemoryCourseStore());
         }
 
         @Bean

@@ -1,7 +1,9 @@
 package com.coursecraft.adapter.out.config;
 
+import com.coursecraft.adapter.out.client.JdbcCourseStore;
 import com.coursecraft.adapter.out.client.JdbcUserStore;
 import com.coursecraft.adapter.out.client.NimbusTokenVerifier;
+import com.coursecraft.port.CourseStore;
 import com.coursecraft.port.TokenVerifier;
 import com.coursecraft.port.UserStore;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -24,6 +26,11 @@ public class OutboundConfig {
     @Bean
     UserStore userStore(JdbcClient jdbcClient) {
         return new JdbcUserStore(jdbcClient);
+    }
+
+    @Bean
+    CourseStore courseStore(JdbcClient jdbcClient) {
+        return new JdbcCourseStore(jdbcClient);
     }
 
     @Bean
