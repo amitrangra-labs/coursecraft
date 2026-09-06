@@ -20,16 +20,21 @@ hit an authenticated backend endpoint.
 
 ## Phase 1 — Creator authoring (video pipeline)
 
-- [ ] Course/section/lecture CRUD (CJ-2).
-- [ ] Video provider integration: direct-upload URL + `asset.ready` webhook (CJ-3).
-- [ ] Creator studio screens: create course, add lecture, upload with progress, publish (CJ-5).
+- [x] Course/section/lecture CRUD (CJ-2) — backend API + JdbcCourseStore + tests.
+- [~] Video: MVP pastes a **YouTube id/URL** (stored + normalized) instead of an upload
+      pipeline. Direct-upload URL + `asset.ready` webhook (CJ-3) deferred until a paid/credited
+      provider is in play.
+- [x] Creator studio screens: become creator, create course, add sections, add video lectures,
+      publish (CJ-5). Android, CI-green.
 
-**Demo:** a teacher creates and publishes a course with a playable video lecture.
+**Demo:** a teacher creates and publishes a course with a playable video lecture. ✅
 
 ## Phase 2 — Learner core: watch + resume  ⭐
 
-- [ ] Discovery + enroll (LJ-1).
-- [ ] Media3 player with signed HLS playback (LJ-2).
+- [x] Discovery + course detail (LJ-1) — catalog + course detail screens. (Enrollment gate still
+      to add; browsing is currently open to any signed-in user.)
+- [~] Player: **YouTube IFrame in a WebView** plays the lecture (LJ-2). Media3/HLS is for
+      provider-hosted video later.
 - [ ] Progress upsert API + throttled client writes + Room offline queue + WorkManager sync.
 - [ ] "Continue learning" rail; resume-at-position (LJ-3).
 
