@@ -1,0 +1,26 @@
+# Render Blueprint — deploys the CourseCraft backend on the free tier.
+# In Render: New → Blueprint → point at this repo. Then set the secret env vars below in the
+# dashboard (they are marked sync:false so Render prompts for them and never stores them here).
+services:
+  - type: web
+    name: coursecraft-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # Supabase Postgres connection
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USER
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      # Supabase JWT verification (JWKS)
+      - key: SUPABASE_JWKS_URI
+        sync: false
+      - key: SUPABASE_JWT_ISSUER
+        sync: false
+    # Render injects PORT automatically; the app reads it via server.port=${PORT:8080}.
