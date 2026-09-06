@@ -41,6 +41,7 @@ fun HomeScreen(
     var role by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
+    var continueItem by remember { mutableStateOf<org.coursecraft.app.data.ContinueItem?>(null) }
 
     LaunchedEffect(accessToken) {
         try {
@@ -49,6 +50,11 @@ fun HomeScreen(
             role = json.optString("role")
         } catch (e: Exception) {
             error = e.message
+        }
+        continueItem = try {
+            CourseApi.continueLearning(accessToken)
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -66,6 +72,13 @@ fun HomeScreen(
 
         Text("Hi, $displayName", style = MaterialTheme.typography.headlineSmall)
         Text("Role: ${role ?: "?"}", style = MaterialTheme.typography.bodyMedium)
+
+        continueItem?.let { c ->
+            Button(
+                onClick = { onNavigate(Screen.Player(c.videoId, c.lectureTitle, c.lectureId)) },
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("▶ Continue: ${c.lectureTitle}") }
+        }
 
         Button(onClick = { onNavigate(Screen.Catalog) }, modifier = Modifier.fillMaxWidth()) {
             Text("Browse courses")

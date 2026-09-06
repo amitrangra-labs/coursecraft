@@ -5,11 +5,13 @@ import com.coursecraft.adapter.in.endpoint.AssessmentHandler;
 import com.coursecraft.adapter.in.endpoint.CourseHandler;
 import com.coursecraft.adapter.in.endpoint.HealthHandler;
 import com.coursecraft.adapter.in.endpoint.MeHandler;
+import com.coursecraft.adapter.in.endpoint.ProgressHandler;
 import com.coursecraft.adapter.in.error.ErrorMapping;
 import com.coursecraft.domain.service.AssessmentService;
 import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.EnrollmentService;
 import com.coursecraft.domain.service.ProfileService;
+import com.coursecraft.domain.service.ProgressService;
 import com.coursecraft.port.TokenVerifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,6 +55,11 @@ public class InboundConfig {
     }
 
     @Bean
+    ProgressHandler progressHandler(ProfileService profileService, ProgressService progressService) {
+        return new ProgressHandler(profileService, progressService);
+    }
+
+    @Bean
     RequestAuth requestAuth(TokenVerifier tokenVerifier) {
         return new RequestAuth(tokenVerifier);
     }
@@ -71,6 +78,7 @@ public class InboundConfig {
     @Bean
     RouterFunction<ServerResponse> securedRoutes(MeHandler meHandler, CourseHandler courseHandler,
                                                  AssessmentHandler assessmentHandler,
+                                                 ProgressHandler progressHandler,
                                                  RequestAuth requestAuth) {
         return route(GET("/api/me"), meHandler::me)
                 .andRoute(POST("/api/creators"), meHandler::becomeCreator)
@@ -92,6 +100,11 @@ public class InboundConfig {
                 .andRoute(GET("/api/assessments/{assessmentId}/take"), assessmentHandler::take)
                 .andRoute(POST("/api/assessments/{assessmentId}/submit"), assessmentHandler::submit)
                 .andRoute(GET("/api/assessments/{assessmentId}/leaderboard"), assessmentHandler::leaderboard)
+                // progress (LJ-2, LJ-3)
+                .andRoute(PUT("/api/progress"), progressHandler::save)
+                .andRoute(GET("/api/my/continue"), progressHandler::continueLearning)
+                .andRoute(GET("/api/lectures/{lectureId}/progress"), progressHandler::get)
+                .andRoute(GET("/api/courses/{courseId}/progress"), progressHandler::courseProgress)
                 // editing / reordering (PUT, not PATCH — Java's HttpURLConnection can't do PATCH;
                 // "order" routes are registered before the {id} routes so they aren't shadowed)
                 .andRoute(PUT("/api/courses/{courseId}/sections/order"), courseHandler::reorderSections)

@@ -39,6 +39,7 @@ fun CourseDetailScreen(
 ) {
     val scope = rememberCoroutineScope()
     var detail by remember { mutableStateOf<CourseDetailView?>(null) }
+    var percent by remember { mutableStateOf<Int?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var reloadKey by remember { mutableStateOf(0) }
     var busy by remember { mutableStateOf(false) }
@@ -48,6 +49,11 @@ fun CourseDetailScreen(
             CourseApi.courseDetail(accessToken, courseId)
         } catch (e: Exception) {
             error = e.message; null
+        }
+        percent = try {
+            CourseApi.courseProgress(accessToken, courseId).percent
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -80,6 +86,8 @@ fun CourseDetailScreen(
                     Button(onClick = { toggleEnroll(false) }, enabled = !busy,
                         modifier = Modifier.fillMaxWidth()) { Text("Enroll") }
                 }
+
+                percent?.let { Text("$it% complete", style = MaterialTheme.typography.bodyMedium) }
 
                 OutlinedButton(onClick = onOpenAssessments, modifier = Modifier.fillMaxWidth()) {
                     Text("Assessments & leaderboards")

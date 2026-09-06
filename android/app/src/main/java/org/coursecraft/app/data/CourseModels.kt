@@ -31,3 +31,16 @@ data class CourseDetailView(
     val sections: List<SectionView>,
     val enrolled: Boolean
 )
+
+data class ProgressState(val positionSec: Int, val completed: Boolean)
+
+data class CourseProgress(val percent: Int, val completed: Int, val total: Int)
+
+data class ContinueItem(
+    val courseId: String,
+    val courseTitle: String,
+    val lectureId: String,
+    val lectureTitle: String,
+    val videoId: String,
+    val positionSec: Int
+)

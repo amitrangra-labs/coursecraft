@@ -4,9 +4,11 @@ import com.coursecraft.domain.service.AssessmentService;
 import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.EnrollmentService;
 import com.coursecraft.domain.service.ProfileService;
+import com.coursecraft.domain.service.ProgressService;
 import com.coursecraft.port.AssessmentStore;
 import com.coursecraft.port.CourseStore;
 import com.coursecraft.port.EnrollmentStore;
+import com.coursecraft.port.ProgressStore;
 import com.coursecraft.port.UserStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,5 +39,10 @@ public class DomainConfig {
     @Bean
     AssessmentService assessmentService(AssessmentStore assessmentStore, CourseStore courseStore) {
         return new AssessmentService(assessmentStore, courseStore);
+    }
+
+    @Bean
+    ProgressService progressService(ProgressStore progressStore, CourseStore courseStore) {
+        return new ProgressService(progressStore, courseStore);
     }
 }

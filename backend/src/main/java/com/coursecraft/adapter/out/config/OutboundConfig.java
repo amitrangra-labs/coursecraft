@@ -3,11 +3,13 @@ package com.coursecraft.adapter.out.config;
 import com.coursecraft.adapter.out.client.JdbcAssessmentStore;
 import com.coursecraft.adapter.out.client.JdbcCourseStore;
 import com.coursecraft.adapter.out.client.JdbcEnrollmentStore;
+import com.coursecraft.adapter.out.client.JdbcProgressStore;
 import com.coursecraft.adapter.out.client.JdbcUserStore;
 import com.coursecraft.adapter.out.client.NimbusTokenVerifier;
 import com.coursecraft.port.AssessmentStore;
 import com.coursecraft.port.CourseStore;
 import com.coursecraft.port.EnrollmentStore;
+import com.coursecraft.port.ProgressStore;
 import com.coursecraft.port.TokenVerifier;
 import com.coursecraft.port.UserStore;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -45,6 +47,11 @@ public class OutboundConfig {
     @Bean
     AssessmentStore assessmentStore(JdbcClient jdbcClient) {
         return new JdbcAssessmentStore(jdbcClient);
+    }
+
+    @Bean
+    ProgressStore progressStore(JdbcClient jdbcClient) {
+        return new JdbcProgressStore(jdbcClient);
     }
 
     @Bean

@@ -14,13 +14,24 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.coursecraft.app.data.CourseApi
 
 /**
- * Plays a YouTube lecture via the IFrame Player API (journey LJ-2). The library manages its own
- * WebView + player lifecycle, which renders reliably where a raw WebView shows a black screen.
+ * Plays a YouTube lecture and saves playback progress (journeys LJ-2/LJ-3). Resumes from the last
+ * saved position, throttles position saves to ~every 10s, and marks the lecture complete near the
+ * end (~95%). (YouTube video does not play in the Android emulator — verify on a device.)
  */
 @Composable
-fun PlayerScreen(videoId: String, title: String, onBack: () -> Unit) {
+fun PlayerScreen(
+    accessToken: String,
+    videoId: String,
+    title: String,
+    lectureId: String,
+    onBack: () -> Unit
+) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -32,11 +43,43 @@ fun PlayerScreen(videoId: String, title: String, onBack: () -> Unit) {
         AndroidView(
             modifier = Modifier.fillMaxWidth(),
             factory = { context ->
+                val io = CoroutineScope(Dispatchers.IO)
                 YouTubePlayerView(context).apply {
                     lifecycleOwner.lifecycle.addObserver(this)
                     addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                        private var duration = 0f
+                        private var lastSavedSec = -100
+                        private var markedComplete = false
+
                         override fun onReady(youTubePlayer: YouTubePlayer) {
-                            youTubePlayer.cueVideo(videoId, 0f)
+                            io.launch {
+                                val start = try {
+                                    CourseApi.getProgress(accessToken, lectureId).positionSec.toFloat()
+                                } catch (e: Exception) {
+                                    0f
+                                }
+                                youTubePlayer.cueVideo(videoId, start)
+                            }
+                        }
+
+                        override fun onVideoDuration(youTubePlayer: YouTubePlayer, d: Float) {
+                            duration = d
+                        }
+
+                        override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                            val sec = second.toInt()
+                            val nearEnd = duration > 0 && second / duration >= 0.95f
+                            if (sec - lastSavedSec >= 10 || (nearEnd && !markedComplete)) {
+                                lastSavedSec = sec
+                                if (nearEnd) markedComplete = true
+                                io.launch {
+                                    try {
+                                        CourseApi.saveProgress(accessToken, lectureId, sec, nearEnd)
+                                    } catch (e: Exception) {
+                                        // best-effort; will retry on next tick
+                                    }
+                                }
+                            }
                         }
                     })
                 }

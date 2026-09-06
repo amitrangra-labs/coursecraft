@@ -110,6 +110,33 @@ object CourseApi {
         request("DELETE", "/api/courses/$courseId/enroll", token, null)
     }
 
+    // --- progress (LJ-2 / LJ-3) ---
+
+    suspend fun saveProgress(token: String, lectureId: String, positionSec: Int, completed: Boolean) {
+        val body = JSONObject().put("lectureId", lectureId).put("positionSec", positionSec).put("completed", completed)
+        request("PUT", "/api/progress", token, body)
+    }
+
+    suspend fun getProgress(token: String, lectureId: String): ProgressState {
+        val o = JSONObject(request("GET", "/api/lectures/$lectureId/progress", token, null))
+        return ProgressState(o.optInt("positionSec"), o.optBoolean("completed"))
+    }
+
+    suspend fun courseProgress(token: String, courseId: String): CourseProgress {
+        val o = JSONObject(request("GET", "/api/courses/$courseId/progress", token, null))
+        return CourseProgress(o.optInt("percent"), o.optInt("completed"), o.optInt("total"))
+    }
+
+    suspend fun continueLearning(token: String): ContinueItem? {
+        val o = JSONObject(request("GET", "/api/my/continue", token, null))
+        if (o.optBoolean("none")) return null
+        return ContinueItem(
+            o.getString("courseId"), o.getString("courseTitle"),
+            o.getString("lectureId"), o.getString("lectureTitle"),
+            o.optString("videoId"), o.optInt("positionSec")
+        )
+    }
+
     // --- HTTP ---
 
     private suspend fun request(method: String, path: String, token: String, body: JSONObject?): String =

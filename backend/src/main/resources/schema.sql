@@ -93,3 +93,14 @@ CREATE TABLE IF NOT EXISTS attempt (
     submitted_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_attempt_assessment ON attempt (assessment_id);
+
+-- Playback progress (Phase 2): one row per (learner, lecture); idempotent upsert.
+CREATE TABLE IF NOT EXISTS progress (
+    learner_id   UUID NOT NULL REFERENCES app_user (id),
+    lecture_id   UUID NOT NULL REFERENCES lecture (id) ON DELETE CASCADE,
+    position_sec INT NOT NULL DEFAULT 0,
+    completed    BOOLEAN NOT NULL DEFAULT false,
+    updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (learner_id, lecture_id)
+);
+CREATE INDEX IF NOT EXISTS idx_progress_learner ON progress (learner_id, updated_at DESC);

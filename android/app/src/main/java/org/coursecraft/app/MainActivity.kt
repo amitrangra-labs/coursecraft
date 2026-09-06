@@ -113,7 +113,7 @@ fun CourseCraftApp() {
             accessToken = token,
             courseId = screen.courseId,
             title = screen.title,
-            onPlay = { navigate(Screen.Player(it.videoId ?: "", it.title)) },
+            onPlay = { navigate(Screen.Player(it.videoId ?: "", it.title, it.id)) },
             onOpenAssessments = { navigate(Screen.LearnerAssessments(screen.courseId, screen.title)) },
             onBack = { back() }
         )
@@ -128,8 +128,10 @@ fun CourseCraftApp() {
         )
 
         is Screen.Player -> PlayerScreen(
+            accessToken = token,
             videoId = screen.videoId,
             title = screen.title,
+            lectureId = screen.lectureId,
             onBack = { back() }
         )
 
