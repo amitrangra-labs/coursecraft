@@ -78,6 +78,50 @@ class CourseServiceTest {
     }
 
     @Test
+    void renameAndDeleteSectionAndLecture() {
+        User owner = user(Role.CREATOR);
+        Course c = service.createCourse(owner, "Algebra", "Math", "Beginner");
+        Section s = service.addSection(owner, c.id(), "Intro");
+        var l = service.addVideoLecture(owner, c.id(), s.id(), "Welcome", "youtube", "dQw4w9WgXcQ");
+
+        Section renamed = service.renameSection(owner, c.id(), s.id(), "Getting started");
+        assertEquals("Getting started", renamed.title());
+
+        var updated = service.updateLecture(owner, c.id(), s.id(), l.id(), "Intro video", "youtube", "abcdEFGHijk");
+        assertEquals("Intro video", updated.title());
+        assertEquals("abcdEFGHijk", updated.videoId());
+
+        service.deleteLecture(owner, c.id(), s.id(), l.id());
+        assertEquals(0, service.getDetail(owner, c.id()).sections().get(0).lectures().size());
+
+        service.deleteSection(owner, c.id(), s.id());
+        assertEquals(0, service.getDetail(owner, c.id()).sections().size());
+    }
+
+    @Test
+    void reorderSectionsChangesOrder() {
+        User owner = user(Role.CREATOR);
+        Course c = service.createCourse(owner, "Algebra", "Math", "Beginner");
+        Section a = service.addSection(owner, c.id(), "A");
+        Section b = service.addSection(owner, c.id(), "B");
+
+        service.reorderSections(owner, c.id(), java.util.List.of(b.id(), a.id()));
+
+        var detail = service.getDetail(owner, c.id());
+        assertEquals("B", detail.sections().get(0).section().title());
+        assertEquals("A", detail.sections().get(1).section().title());
+    }
+
+    @Test
+    void reorderRejectsForeignIds() {
+        User owner = user(Role.CREATOR);
+        Course c = service.createCourse(owner, "Algebra", "Math", "Beginner");
+        service.addSection(owner, c.id(), "A");
+        assertThrows(ValidationException.class,
+                () -> service.reorderSections(owner, c.id(), java.util.List.of(UUID.randomUUID())));
+    }
+
+    @Test
     void publishedCourseAppearsInCatalog() {
         User owner = user(Role.CREATOR);
         Course c = service.createCourse(owner, "Algebra", "Math", "Beginner");

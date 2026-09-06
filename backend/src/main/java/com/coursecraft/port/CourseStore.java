@@ -28,7 +28,27 @@ public interface CourseStore {
 
     List<Section> listSections(UUID courseId);
 
+    void updateCourse(UUID id, String title, String subject, String level);
+
+    void deleteCourse(UUID id);
+
+    void updateSection(UUID id, String title);
+
+    void deleteSection(UUID id);
+
+    /** Set each section's position to its index in the given order. */
+    void updateSectionPositions(List<UUID> orderedIds);
+
     Lecture insertLecture(Lecture lecture);
+
+    Optional<Lecture> findLecture(UUID id);
+
+    void updateLecture(UUID id, String title, String provider, String videoId);
+
+    void deleteLecture(UUID id);
+
+    /** Set each lecture's position to its index in the given order. */
+    void updateLecturePositions(List<UUID> orderedIds);
 
     List<Lecture> listLecturesBySection(UUID sectionId);
 

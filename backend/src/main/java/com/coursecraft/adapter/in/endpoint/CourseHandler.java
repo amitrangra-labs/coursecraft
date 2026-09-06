@@ -62,6 +62,65 @@ public final class CourseHandler {
         return ServerResponse.ok().body(CourseSummary.from(course));
     }
 
+    // --- creator editing / reordering ---
+
+    public ServerResponse renameCourse(ServerRequest request) throws Exception {
+        User user = currentUser(request);
+        UUID courseId = uuid(request, "courseId");
+        CreateCourseRequest body = request.body(CreateCourseRequest.class);
+        Course course = courseService.renameCourse(user, courseId, body.title(), body.subject(), body.level());
+        return ServerResponse.ok().body(CourseSummary.from(course));
+    }
+
+    public ServerResponse deleteCourse(ServerRequest request) {
+        courseService.deleteCourse(currentUser(request), uuid(request, "courseId"));
+        return ok();
+    }
+
+    public ServerResponse renameSection(ServerRequest request) throws Exception {
+        User user = currentUser(request);
+        TitleRequest body = request.body(TitleRequest.class);
+        Section section = courseService.renameSection(user, uuid(request, "courseId"),
+                uuid(request, "sectionId"), body.title());
+        return ServerResponse.ok().body(SectionView.from(section, List.of()));
+    }
+
+    public ServerResponse deleteSection(ServerRequest request) {
+        courseService.deleteSection(currentUser(request), uuid(request, "courseId"),
+                uuid(request, "sectionId"));
+        return ok();
+    }
+
+    public ServerResponse reorderSections(ServerRequest request) throws Exception {
+        User user = currentUser(request);
+        IdListRequest body = request.body(IdListRequest.class);
+        courseService.reorderSections(user, uuid(request, "courseId"), toUuids(body));
+        return ok();
+    }
+
+    public ServerResponse updateLecture(ServerRequest request) throws Exception {
+        User user = currentUser(request);
+        UpdateLectureRequest body = request.body(UpdateLectureRequest.class);
+        Lecture lecture = courseService.updateLecture(user, uuid(request, "courseId"),
+                uuid(request, "sectionId"), uuid(request, "lectureId"),
+                body.title(), body.videoProvider(), body.videoId());
+        return ServerResponse.ok().body(LectureView.from(lecture));
+    }
+
+    public ServerResponse deleteLecture(ServerRequest request) {
+        courseService.deleteLecture(currentUser(request), uuid(request, "courseId"),
+                uuid(request, "sectionId"), uuid(request, "lectureId"));
+        return ok();
+    }
+
+    public ServerResponse reorderLectures(ServerRequest request) throws Exception {
+        User user = currentUser(request);
+        IdListRequest body = request.body(IdListRequest.class);
+        courseService.reorderLectures(user, uuid(request, "courseId"), uuid(request, "sectionId"),
+                toUuids(body));
+        return ok();
+    }
+
     public ServerResponse myCourses(ServerRequest request) {
         User user = currentUser(request);
         return ServerResponse.ok().body(courseService.listMyCourses(user).stream()
@@ -92,6 +151,17 @@ public final class CourseHandler {
         return UUID.fromString(request.pathVariable(name));
     }
 
+    private static ServerResponse ok() {
+        return ServerResponse.ok().body(java.util.Map.of("status", "ok"));
+    }
+
+    private static List<UUID> toUuids(IdListRequest body) {
+        if (body == null || body.ids() == null) {
+            return List.of();
+        }
+        return body.ids().stream().map(UUID::fromString).toList();
+    }
+
     // --- request bodies ---
 
     public record CreateCourseRequest(String title, String subject, String level) {
@@ -101,6 +171,12 @@ public final class CourseHandler {
     }
 
     public record CreateLectureRequest(String title, String videoProvider, String videoId) {
+    }
+
+    public record UpdateLectureRequest(String title, String videoProvider, String videoId) {
+    }
+
+    public record IdListRequest(List<String> ids) {
     }
 
     // --- responses ---

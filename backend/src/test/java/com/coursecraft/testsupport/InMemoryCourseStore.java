@@ -75,12 +75,72 @@ public final class InMemoryCourseStore implements CourseStore {
     }
 
     @Override
+    public void updateCourse(UUID id, String title, String subject, String level) {
+        Course c = courses.get(id);
+        courses.put(id, new Course(c.id(), c.creatorId(), title, subject, level, c.status(), c.createdAt()));
+    }
+
+    @Override
+    public void deleteCourse(UUID id) {
+        courses.remove(id);
+        List<UUID> secIds = sections.values().stream()
+                .filter(s -> s.courseId().equals(id)).map(Section::id).toList();
+        secIds.forEach(this::deleteSection);
+    }
+
+    @Override
+    public void updateSection(UUID id, String title) {
+        Section s = sections.get(id);
+        sections.put(id, new Section(s.id(), s.courseId(), title, s.position(), s.createdAt()));
+    }
+
+    @Override
+    public void deleteSection(UUID id) {
+        sections.remove(id);
+        lectures.values().removeIf(l -> l.sectionId().equals(id));
+    }
+
+    @Override
+    public void updateSectionPositions(List<UUID> orderedIds) {
+        for (int i = 0; i < orderedIds.size(); i++) {
+            Section s = sections.get(orderedIds.get(i));
+            sections.put(s.id(), new Section(s.id(), s.courseId(), s.title(), i, s.createdAt()));
+        }
+    }
+
+    @Override
     public Lecture insertLecture(Lecture lecture) {
         Lecture stored = new Lecture(lecture.id(), lecture.sectionId(), lecture.title(),
                 lecture.type(), lecture.videoProvider(), lecture.videoId(), lecture.position(),
                 Instant.now());
         lectures.put(stored.id(), stored);
         return stored;
+    }
+
+    @Override
+    public Optional<Lecture> findLecture(UUID id) {
+        return Optional.ofNullable(lectures.get(id));
+    }
+
+    @Override
+    public void updateLecture(UUID id, String title, String provider, String videoId) {
+        Lecture l = lectures.get(id);
+        lectures.put(id, new Lecture(l.id(), l.sectionId(), title, l.type(), provider, videoId,
+                l.position(), l.createdAt()));
+    }
+
+    @Override
+    public void deleteLecture(UUID id) {
+        lectures.remove(id);
+    }
+
+    @Override
+    public void updateLecturePositions(List<UUID> orderedIds) {
+        for (int i = 0; i < orderedIds.size(); i++) {
+            Lecture l = lectures.get(orderedIds.get(i));
+            lectures.put(l.id(), new Lecture(l.id(), l.sectionId(), l.title(), l.type(),
+                    l.videoProvider(), l.videoId(), i, l.createdAt()));
+        }
     }
 
     @Override

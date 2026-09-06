@@ -123,6 +123,40 @@ public final class JdbcCourseStore implements CourseStore {
     }
 
     @Override
+    public void updateCourse(UUID id, String title, String subject, String level) {
+        jdbc.sql("UPDATE course SET title = :title, subject = :subject, level = :level WHERE id = :id")
+                .param("title", title)
+                .param("subject", subject)
+                .param("level", level)
+                .param("id", id)
+                .update();
+    }
+
+    @Override
+    public void deleteCourse(UUID id) {
+        jdbc.sql("DELETE FROM course WHERE id = :id").param("id", id).update();
+    }
+
+    @Override
+    public void updateSection(UUID id, String title) {
+        jdbc.sql("UPDATE course_section SET title = :title WHERE id = :id")
+                .param("title", title).param("id", id).update();
+    }
+
+    @Override
+    public void deleteSection(UUID id) {
+        jdbc.sql("DELETE FROM course_section WHERE id = :id").param("id", id).update();
+    }
+
+    @Override
+    public void updateSectionPositions(List<UUID> orderedIds) {
+        for (int i = 0; i < orderedIds.size(); i++) {
+            jdbc.sql("UPDATE course_section SET position = :pos WHERE id = :id")
+                    .param("pos", i).param("id", orderedIds.get(i)).update();
+        }
+    }
+
+    @Override
     public Lecture insertLecture(Lecture l) {
         jdbc.sql("""
                         INSERT INTO lecture
@@ -145,6 +179,43 @@ public final class JdbcCourseStore implements CourseStore {
                 .param("id", l.id())
                 .query(JdbcCourseStore::mapLecture)
                 .single();
+    }
+
+    @Override
+    public Optional<Lecture> findLecture(UUID id) {
+        return jdbc.sql("""
+                        SELECT id, section_id, title, type, video_provider, video_id, position, created_at
+                        FROM lecture WHERE id = :id
+                        """)
+                .param("id", id)
+                .query(JdbcCourseStore::mapLecture)
+                .optional();
+    }
+
+    @Override
+    public void updateLecture(UUID id, String title, String provider, String videoId) {
+        jdbc.sql("""
+                        UPDATE lecture SET title = :title, video_provider = :provider, video_id = :videoId
+                        WHERE id = :id
+                        """)
+                .param("title", title)
+                .param("provider", provider)
+                .param("videoId", videoId)
+                .param("id", id)
+                .update();
+    }
+
+    @Override
+    public void deleteLecture(UUID id) {
+        jdbc.sql("DELETE FROM lecture WHERE id = :id").param("id", id).update();
+    }
+
+    @Override
+    public void updateLecturePositions(List<UUID> orderedIds) {
+        for (int i = 0; i < orderedIds.size(); i++) {
+            jdbc.sql("UPDATE lecture SET position = :pos WHERE id = :id")
+                    .param("pos", i).param("id", orderedIds.get(i)).update();
+        }
     }
 
     @Override

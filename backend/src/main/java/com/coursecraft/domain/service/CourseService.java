@@ -14,6 +14,7 @@ import com.coursecraft.domain.object.User;
 import com.coursecraft.port.CourseStore;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,6 +83,64 @@ public final class CourseService {
         return store.listByCreator(creator.id());
     }
 
+    // --- Creator editing / reordering ---
+
+    public Course renameCourse(User creator, UUID courseId, String title, String subject, String level) {
+        getOwnedCourse(creator, courseId);
+        store.updateCourse(courseId, requireText(title, "title"), blankToNull(subject), blankToNull(level));
+        return store.findCourse(courseId).orElseThrow();
+    }
+
+    public void deleteCourse(User creator, UUID courseId) {
+        getOwnedCourse(creator, courseId);
+        store.deleteCourse(courseId);
+    }
+
+    public Section renameSection(User creator, UUID courseId, UUID sectionId, String title) {
+        ownedSection(creator, courseId, sectionId);
+        store.updateSection(sectionId, requireText(title, "title"));
+        return store.findSection(sectionId).orElseThrow();
+    }
+
+    public void deleteSection(User creator, UUID courseId, UUID sectionId) {
+        ownedSection(creator, courseId, sectionId);
+        store.deleteSection(sectionId);
+    }
+
+    public void reorderSections(User creator, UUID courseId, List<UUID> orderedIds) {
+        getOwnedCourse(creator, courseId);
+        List<UUID> current = store.listSections(courseId).stream().map(Section::id).toList();
+        if (!Set.copyOf(current).equals(Set.copyOf(orderedIds)) || current.size() != orderedIds.size()) {
+            throw new ValidationException("Order must contain exactly this course's sections");
+        }
+        store.updateSectionPositions(orderedIds);
+    }
+
+    public Lecture updateLecture(User creator, UUID courseId, UUID sectionId, UUID lectureId,
+                                 String title, String provider, String rawVideoRef) {
+        ownedSection(creator, courseId, sectionId);
+        Lecture lecture = lectureInSection(sectionId, lectureId);
+        String cleanProvider = blankToNull(provider) == null ? lecture.videoProvider() : provider.trim().toLowerCase();
+        String videoId = normalizeVideoId(cleanProvider, requireText(rawVideoRef, "videoId"));
+        store.updateLecture(lectureId, requireText(title, "title"), cleanProvider, videoId);
+        return store.findLecture(lectureId).orElseThrow();
+    }
+
+    public void deleteLecture(User creator, UUID courseId, UUID sectionId, UUID lectureId) {
+        ownedSection(creator, courseId, sectionId);
+        lectureInSection(sectionId, lectureId);
+        store.deleteLecture(lectureId);
+    }
+
+    public void reorderLectures(User creator, UUID courseId, UUID sectionId, List<UUID> orderedIds) {
+        ownedSection(creator, courseId, sectionId);
+        List<UUID> current = store.listLecturesBySection(sectionId).stream().map(Lecture::id).toList();
+        if (!Set.copyOf(current).equals(Set.copyOf(orderedIds)) || current.size() != orderedIds.size()) {
+            throw new ValidationException("Order must contain exactly this section's lectures");
+        }
+        store.updateLecturePositions(orderedIds);
+    }
+
     // --- Learner catalog ---
 
     public List<Course> catalog() {
@@ -120,6 +179,25 @@ public final class CourseService {
             throw new ForbiddenException("You do not own this course");
         }
         return course;
+    }
+
+    private Section ownedSection(User creator, UUID courseId, UUID sectionId) {
+        getOwnedCourse(creator, courseId);
+        Section section = store.findSection(sectionId)
+                .orElseThrow(() -> new NotFoundException("Section not found"));
+        if (!section.courseId().equals(courseId)) {
+            throw new NotFoundException("Section not found in this course");
+        }
+        return section;
+    }
+
+    private Lecture lectureInSection(UUID sectionId, UUID lectureId) {
+        Lecture lecture = store.findLecture(lectureId)
+                .orElseThrow(() -> new NotFoundException("Lecture not found"));
+        if (!lecture.sectionId().equals(sectionId)) {
+            throw new NotFoundException("Lecture not found in this section");
+        }
+        return lecture;
     }
 
     private static String requireText(String value, String field) {
