@@ -10,4 +10,11 @@ sealed interface Screen {
     data class CourseDetail(val courseId: String, val title: String) : Screen
     data class ManageCourse(val courseId: String, val title: String) : Screen
     data class Player(val videoId: String, val title: String) : Screen
+
+    // Assessments (Phase 3)
+    data class CreatorAssessments(val courseId: String, val title: String) : Screen
+    data class AddQuestion(val assessmentId: String, val title: String) : Screen
+    data class LearnerAssessments(val courseId: String, val title: String) : Screen
+    data class TakeAssessment(val assessmentId: String, val title: String) : Screen
+    data class Leaderboard(val assessmentId: String, val title: String) : Screen
 }

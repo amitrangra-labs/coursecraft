@@ -20,14 +20,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import org.coursecraft.app.ui.AddQuestionScreen
 import org.coursecraft.app.ui.CourseDetailScreen
 import org.coursecraft.app.ui.CourseListScreen
 import org.coursecraft.app.ui.CreateCourseScreen
+import org.coursecraft.app.ui.CreatorAssessmentsScreen
 import org.coursecraft.app.ui.HomeScreen
+import org.coursecraft.app.ui.LeaderboardScreen
+import org.coursecraft.app.ui.LearnerAssessmentsScreen
 import org.coursecraft.app.ui.ManageCourseScreen
 import org.coursecraft.app.ui.PlayerScreen
 import org.coursecraft.app.ui.Screen
 import org.coursecraft.app.ui.SignInScreen
+import org.coursecraft.app.ui.TakeAssessmentScreen
 import org.coursecraft.app.data.CourseApi
 
 class MainActivity : ComponentActivity() {
@@ -109,6 +114,7 @@ fun CourseCraftApp() {
             courseId = screen.courseId,
             title = screen.title,
             onPlay = { navigate(Screen.Player(it.videoId ?: "", it.title)) },
+            onOpenAssessments = { navigate(Screen.LearnerAssessments(screen.courseId, screen.title)) },
             onBack = { back() }
         )
 
@@ -116,12 +122,52 @@ fun CourseCraftApp() {
             accessToken = token,
             courseId = screen.courseId,
             title = screen.title,
+            onOpenAssessments = { navigate(Screen.CreatorAssessments(screen.courseId, screen.title)) },
             onDeleted = { back() },
             onBack = { back() }
         )
 
         is Screen.Player -> PlayerScreen(
             videoId = screen.videoId,
+            title = screen.title,
+            onBack = { back() }
+        )
+
+        is Screen.CreatorAssessments -> CreatorAssessmentsScreen(
+            accessToken = token,
+            courseId = screen.courseId,
+            title = screen.title,
+            onOpenAssessment = { navigate(Screen.AddQuestion(it.id, it.title)) },
+            onBack = { back() }
+        )
+
+        is Screen.AddQuestion -> AddQuestionScreen(
+            accessToken = token,
+            assessmentId = screen.assessmentId,
+            title = screen.title,
+            onBack = { back() }
+        )
+
+        is Screen.LearnerAssessments -> LearnerAssessmentsScreen(
+            accessToken = token,
+            courseId = screen.courseId,
+            title = screen.title,
+            onTake = { navigate(Screen.TakeAssessment(it.id, it.title)) },
+            onLeaderboard = { navigate(Screen.Leaderboard(it.id, it.title)) },
+            onBack = { back() }
+        )
+
+        is Screen.TakeAssessment -> TakeAssessmentScreen(
+            accessToken = token,
+            assessmentId = screen.assessmentId,
+            title = screen.title,
+            onViewLeaderboard = { navigate(Screen.Leaderboard(screen.assessmentId, screen.title)) },
+            onBack = { back() }
+        )
+
+        is Screen.Leaderboard -> LeaderboardScreen(
+            accessToken = token,
+            assessmentId = screen.assessmentId,
             title = screen.title,
             onBack = { back() }
         )

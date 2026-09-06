@@ -37,6 +37,7 @@ fun ManageCourseScreen(
     accessToken: String,
     courseId: String,
     title: String,
+    onOpenAssessments: () -> Unit,
     onDeleted: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -151,6 +152,10 @@ fun ManageCourseScreen(
                         ) { Text("Add video lecture") }
                     }
                 }
+            }
+
+            OutlinedButton(onClick = onOpenAssessments, modifier = Modifier.fillMaxWidth()) {
+                Text("Manage assessments")
             }
 
             Button(onClick = { submit { CourseApi.publish(accessToken, courseId) } }, modifier = Modifier.fillMaxWidth()) {
