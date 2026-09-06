@@ -31,8 +31,8 @@ hit an authenticated backend endpoint.
 
 ## Phase 2 — Learner core: watch + resume  ⭐
 
-- [x] Discovery + course detail (LJ-1) — catalog + course detail screens. (Enrollment gate still
-      to add; browsing is currently open to any signed-in user.)
+- [x] Discovery + enroll (LJ-1) — catalog, course detail, enroll/unenroll, and a "My Learning"
+      list of enrolled courses.
 - [~] Player: **YouTube IFrame in a WebView** plays the lecture (LJ-2). Media3/HLS is for
       provider-hosted video later.
 - [ ] Progress upsert API + throttled client writes + Room offline queue + WorkManager sync.
