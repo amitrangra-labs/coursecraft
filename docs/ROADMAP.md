@@ -8,8 +8,8 @@ Milestone-based, each phase independently demoable. Journeys referenced by their
 - [x] Backend skeleton: hexagonal layout, `Application`, 3 config classes, health endpoint.
 - [x] PostgreSQL + `schema.sql`, `JdbcClient` wiring (`app_user` baseline).
 - [x] JWT verify against Supabase JWKS; `learner` role default + creator upgrade; JIT provisioning.
-- [~] Android app skeleton: Compose home screen + backend health check. (Supabase sign-in +
-      navigation still to wire.)
+- [x] Android app: Compose + email/password Supabase sign-in → authenticated `/api/me`
+      (end-to-end: Supabase JWT → backend JWKS verify → provisioned profile).
 - [x] CI: build + test for backend and Android.
 - [x] **Signed universal release APK** produced by CI and attached to a **GitHub Release**,
       with published SHA-256 + signing-cert fingerprints (release keystore in Actions
