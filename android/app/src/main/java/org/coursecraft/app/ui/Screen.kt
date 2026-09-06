@@ -1,0 +1,12 @@
+package org.coursecraft.app.ui
+
+/** The in-app destinations. A tiny back stack in CourseCraftApp drives navigation. */
+sealed interface Screen {
+    data object Home : Screen
+    data object Catalog : Screen
+    data object MyCourses : Screen
+    data object CreateCourse : Screen
+    data class CourseDetail(val courseId: String, val title: String) : Screen
+    data class ManageCourse(val courseId: String, val title: String) : Screen
+    data class Player(val videoId: String, val title: String) : Screen
+}
