@@ -43,6 +43,47 @@ object CourseApi {
         return parseCourse(JSONObject(request("POST", "/api/courses/$courseId/publish", token, null)))
     }
 
+    // --- editing / reordering ---
+
+    suspend fun renameCourse(token: String, courseId: String, title: String, subject: String, level: String) {
+        val body = JSONObject().put("title", title).put("subject", subject).put("level", level)
+        request("PUT", "/api/courses/$courseId", token, body)
+    }
+
+    suspend fun deleteCourse(token: String, courseId: String) {
+        request("DELETE", "/api/courses/$courseId", token, null)
+    }
+
+    suspend fun renameSection(token: String, courseId: String, sectionId: String, title: String) {
+        val body = JSONObject().put("title", title)
+        request("PUT", "/api/courses/$courseId/sections/$sectionId", token, body)
+    }
+
+    suspend fun deleteSection(token: String, courseId: String, sectionId: String) {
+        request("DELETE", "/api/courses/$courseId/sections/$sectionId", token, null)
+    }
+
+    suspend fun reorderSections(token: String, courseId: String, orderedIds: List<String>) {
+        val body = JSONObject().put("ids", JSONArray(orderedIds))
+        request("PUT", "/api/courses/$courseId/sections/order", token, body)
+    }
+
+    suspend fun updateLecture(
+        token: String, courseId: String, sectionId: String, lectureId: String, title: String, videoId: String
+    ) {
+        val body = JSONObject().put("title", title).put("videoProvider", "youtube").put("videoId", videoId)
+        request("PUT", "/api/courses/$courseId/sections/$sectionId/lectures/$lectureId", token, body)
+    }
+
+    suspend fun deleteLecture(token: String, courseId: String, sectionId: String, lectureId: String) {
+        request("DELETE", "/api/courses/$courseId/sections/$sectionId/lectures/$lectureId", token, null)
+    }
+
+    suspend fun reorderLectures(token: String, courseId: String, sectionId: String, orderedIds: List<String>) {
+        val body = JSONObject().put("ids", JSONArray(orderedIds))
+        request("PUT", "/api/courses/$courseId/sections/$sectionId/lectures/order", token, body)
+    }
+
     suspend fun myCourses(token: String): List<CourseSummary> =
         parseCourseList(request("GET", "/api/courses/mine", token, null))
 

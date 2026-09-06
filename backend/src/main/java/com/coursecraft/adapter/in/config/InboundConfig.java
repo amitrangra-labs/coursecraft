@@ -15,7 +15,6 @@ import org.springframework.web.servlet.function.ServerResponse;
 
 import static org.springframework.web.servlet.function.RequestPredicates.DELETE;
 import static org.springframework.web.servlet.function.RequestPredicates.GET;
-import static org.springframework.web.servlet.function.RequestPredicates.PATCH;
 import static org.springframework.web.servlet.function.RequestPredicates.POST;
 import static org.springframework.web.servlet.function.RequestPredicates.PUT;
 import static org.springframework.web.servlet.function.RouterFunctions.route;
@@ -72,17 +71,18 @@ public class InboundConfig {
                         courseHandler::addLecture)
                 .andRoute(POST("/api/courses/{courseId}/sections"), courseHandler::addSection)
                 .andRoute(POST("/api/courses/{courseId}/publish"), courseHandler::publish)
-                // editing / reordering
+                // editing / reordering (PUT, not PATCH — Java's HttpURLConnection can't do PATCH;
+                // "order" routes are registered before the {id} routes so they aren't shadowed)
                 .andRoute(PUT("/api/courses/{courseId}/sections/order"), courseHandler::reorderSections)
                 .andRoute(PUT("/api/courses/{courseId}/sections/{sectionId}/lectures/order"),
                         courseHandler::reorderLectures)
-                .andRoute(PATCH("/api/courses/{courseId}/sections/{sectionId}/lectures/{lectureId}"),
+                .andRoute(PUT("/api/courses/{courseId}/sections/{sectionId}/lectures/{lectureId}"),
                         courseHandler::updateLecture)
                 .andRoute(DELETE("/api/courses/{courseId}/sections/{sectionId}/lectures/{lectureId}"),
                         courseHandler::deleteLecture)
-                .andRoute(PATCH("/api/courses/{courseId}/sections/{sectionId}"), courseHandler::renameSection)
+                .andRoute(PUT("/api/courses/{courseId}/sections/{sectionId}"), courseHandler::renameSection)
                 .andRoute(DELETE("/api/courses/{courseId}/sections/{sectionId}"), courseHandler::deleteSection)
-                .andRoute(PATCH("/api/courses/{courseId}"), courseHandler::renameCourse)
+                .andRoute(PUT("/api/courses/{courseId}"), courseHandler::renameCourse)
                 .andRoute(DELETE("/api/courses/{courseId}"), courseHandler::deleteCourse)
                 .andRoute(GET("/api/courses/{courseId}"), courseHandler::courseDetail)
                 .filter(ErrorMapping.filter())

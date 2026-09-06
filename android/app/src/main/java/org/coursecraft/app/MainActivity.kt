@@ -108,6 +108,7 @@ fun CourseCraftApp() {
             accessToken = token,
             courseId = screen.courseId,
             title = screen.title,
+            onDeleted = { back() },
             onBack = { back() }
         )
 
