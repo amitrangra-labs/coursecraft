@@ -1,7 +1,17 @@
 # CourseCraft Android app
 
-Kotlin + Jetpack Compose. Phase 0 scope: app skeleton + a screen that proves it can reach the
-backend (`GET /api/health`). Supabase sign-in and the feature screens come next.
+Kotlin + Jetpack Compose. Phase 0 scope: **email/password sign-in via Supabase**, then the
+authenticated end-to-end path (Supabase JWT → backend verifies it → `GET /api/me` shows the
+provisioned profile). Feature screens (courses, player, assessments) come next.
+
+Auth flow: `SignInScreen` → `SupabaseAuthClient` calls GoTrue (`/auth/v1/signup`,
+`/auth/v1/token?grant_type=password`) with the publishable key → access token → `HomeScreen`
+calls the backend `/api/me` with `Authorization: Bearer <token>`.
+
+> For local testing, turn **off** email confirmation in Supabase (Authentication → Sign In /
+> Providers → Email), or a new sign-up can't log in until it confirms. Re-enable before launch.
+> `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` are set in `gradle.properties` (the publishable key
+> is public by design); override per build with `-PSUPABASE_URL=... -PSUPABASE_PUBLISHABLE_KEY=...`.
 
 The MVP is distributed as a **sideloadable signed APK** — see
 [../docs/DISTRIBUTION.md](../docs/DISTRIBUTION.md). CI builds it; there is no Play Store for the MVP.

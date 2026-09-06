@@ -19,6 +19,12 @@ android {
         val backendBaseUrl = (project.findProperty("BACKEND_BASE_URL") as String?)
             ?: "http://10.0.2.2:8080"
         buildConfigField("String", "BACKEND_BASE_URL", "\"$backendBaseUrl\"")
+
+        // Supabase Auth (publishable key is public by design).
+        val supabaseUrl = (project.findProperty("SUPABASE_URL") as String?) ?: ""
+        val supabaseKey = (project.findProperty("SUPABASE_PUBLISHABLE_KEY") as String?) ?: ""
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"$supabaseKey\"")
     }
 
     // Release signing is driven by env vars so no secrets live in the repo. When they are absent
