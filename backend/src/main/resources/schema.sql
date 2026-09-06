@@ -54,3 +54,42 @@ CREATE TABLE IF NOT EXISTS enrollment (
     UNIQUE (learner_id, course_id)
 );
 CREATE INDEX IF NOT EXISTS idx_enrollment_learner ON enrollment (learner_id);
+
+-- Assessments (Phase 3): auto-gradable questions + leaderboards.
+CREATE TABLE IF NOT EXISTS assessment (
+    id         UUID PRIMARY KEY,
+    course_id  UUID NOT NULL REFERENCES course (id) ON DELETE CASCADE,
+    title      TEXT NOT NULL,
+    pass_mark  INT NOT NULL DEFAULT 50,   -- percentage 0-100
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_assessment_course ON assessment (course_id);
+
+CREATE TABLE IF NOT EXISTS question (
+    id            UUID PRIMARY KEY,
+    assessment_id UUID NOT NULL REFERENCES assessment (id) ON DELETE CASCADE,
+    text          TEXT NOT NULL,
+    type          TEXT NOT NULL,          -- SINGLE | MULTIPLE | TRUE_FALSE
+    points        INT NOT NULL DEFAULT 1,
+    position      INT NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_question_assessment ON question (assessment_id);
+
+CREATE TABLE IF NOT EXISTS question_option (
+    id          UUID PRIMARY KEY,
+    question_id UUID NOT NULL REFERENCES question (id) ON DELETE CASCADE,
+    text        TEXT NOT NULL,
+    correct     BOOLEAN NOT NULL DEFAULT false,
+    position    INT NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_option_question ON question_option (question_id);
+
+CREATE TABLE IF NOT EXISTS attempt (
+    id            UUID PRIMARY KEY,
+    assessment_id UUID NOT NULL REFERENCES assessment (id) ON DELETE CASCADE,
+    learner_id    UUID NOT NULL REFERENCES app_user (id),
+    score         INT NOT NULL,
+    max_score     INT NOT NULL,
+    submitted_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_attempt_assessment ON attempt (assessment_id);

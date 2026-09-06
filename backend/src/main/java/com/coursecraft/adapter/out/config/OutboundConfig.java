@@ -1,9 +1,11 @@
 package com.coursecraft.adapter.out.config;
 
+import com.coursecraft.adapter.out.client.JdbcAssessmentStore;
 import com.coursecraft.adapter.out.client.JdbcCourseStore;
 import com.coursecraft.adapter.out.client.JdbcEnrollmentStore;
 import com.coursecraft.adapter.out.client.JdbcUserStore;
 import com.coursecraft.adapter.out.client.NimbusTokenVerifier;
+import com.coursecraft.port.AssessmentStore;
 import com.coursecraft.port.CourseStore;
 import com.coursecraft.port.EnrollmentStore;
 import com.coursecraft.port.TokenVerifier;
@@ -38,6 +40,11 @@ public class OutboundConfig {
     @Bean
     EnrollmentStore enrollmentStore(JdbcClient jdbcClient) {
         return new JdbcEnrollmentStore(jdbcClient);
+    }
+
+    @Bean
+    AssessmentStore assessmentStore(JdbcClient jdbcClient) {
+        return new JdbcAssessmentStore(jdbcClient);
     }
 
     @Bean

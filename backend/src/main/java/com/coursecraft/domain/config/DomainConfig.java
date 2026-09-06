@@ -1,8 +1,10 @@
 package com.coursecraft.domain.config;
 
+import com.coursecraft.domain.service.AssessmentService;
 import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.EnrollmentService;
 import com.coursecraft.domain.service.ProfileService;
+import com.coursecraft.port.AssessmentStore;
 import com.coursecraft.port.CourseStore;
 import com.coursecraft.port.EnrollmentStore;
 import com.coursecraft.port.UserStore;
@@ -30,5 +32,10 @@ public class DomainConfig {
     @Bean
     EnrollmentService enrollmentService(EnrollmentStore enrollmentStore, CourseStore courseStore) {
         return new EnrollmentService(enrollmentStore, courseStore);
+    }
+
+    @Bean
+    AssessmentService assessmentService(AssessmentStore assessmentStore, CourseStore courseStore) {
+        return new AssessmentService(assessmentStore, courseStore);
     }
 }

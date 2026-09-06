@@ -4,12 +4,14 @@ import com.coursecraft.adapter.in.config.InboundConfig;
 import com.coursecraft.domain.object.Role;
 import com.coursecraft.domain.object.User;
 import com.coursecraft.domain.object.VerifiedToken;
+import com.coursecraft.domain.service.AssessmentService;
 import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.EnrollmentService;
 import com.coursecraft.domain.service.ProfileService;
 import com.coursecraft.port.CourseStore;
 import com.coursecraft.port.TokenVerifier;
 import com.coursecraft.port.UserStore;
+import com.coursecraft.testsupport.InMemoryAssessmentStore;
 import com.coursecraft.testsupport.InMemoryCourseStore;
 import com.coursecraft.testsupport.InMemoryEnrollmentStore;
 import org.junit.jupiter.api.Test;
@@ -114,6 +116,11 @@ class InboundRoutesTest {
         @Bean
         EnrollmentService enrollmentService(CourseStore courseStore) {
             return new EnrollmentService(new InMemoryEnrollmentStore(courseStore), courseStore);
+        }
+
+        @Bean
+        AssessmentService assessmentService(CourseStore courseStore) {
+            return new AssessmentService(new InMemoryAssessmentStore(), courseStore);
         }
 
         @Bean

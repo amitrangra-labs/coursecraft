@@ -1,10 +1,12 @@
 package com.coursecraft.adapter.in.config;
 
 import com.coursecraft.adapter.in.auth.RequestAuth;
+import com.coursecraft.adapter.in.endpoint.AssessmentHandler;
 import com.coursecraft.adapter.in.endpoint.CourseHandler;
 import com.coursecraft.adapter.in.endpoint.HealthHandler;
 import com.coursecraft.adapter.in.endpoint.MeHandler;
 import com.coursecraft.adapter.in.error.ErrorMapping;
+import com.coursecraft.domain.service.AssessmentService;
 import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.EnrollmentService;
 import com.coursecraft.domain.service.ProfileService;
@@ -46,6 +48,11 @@ public class InboundConfig {
     }
 
     @Bean
+    AssessmentHandler assessmentHandler(ProfileService profileService, AssessmentService assessmentService) {
+        return new AssessmentHandler(profileService, assessmentService);
+    }
+
+    @Bean
     RequestAuth requestAuth(TokenVerifier tokenVerifier) {
         return new RequestAuth(tokenVerifier);
     }
@@ -63,6 +70,7 @@ public class InboundConfig {
      */
     @Bean
     RouterFunction<ServerResponse> securedRoutes(MeHandler meHandler, CourseHandler courseHandler,
+                                                 AssessmentHandler assessmentHandler,
                                                  RequestAuth requestAuth) {
         return route(GET("/api/me"), meHandler::me)
                 .andRoute(POST("/api/creators"), meHandler::becomeCreator)
@@ -77,6 +85,13 @@ public class InboundConfig {
                 .andRoute(GET("/api/my/learning"), courseHandler::myLearning)
                 .andRoute(POST("/api/courses/{courseId}/enroll"), courseHandler::enroll)
                 .andRoute(DELETE("/api/courses/{courseId}/enroll"), courseHandler::unenroll)
+                // assessments (CJ-4, LJ-4, LJ-5)
+                .andRoute(POST("/api/courses/{courseId}/assessments"), assessmentHandler::create)
+                .andRoute(GET("/api/courses/{courseId}/assessments"), assessmentHandler::listForCourse)
+                .andRoute(POST("/api/assessments/{assessmentId}/questions"), assessmentHandler::addQuestion)
+                .andRoute(GET("/api/assessments/{assessmentId}/take"), assessmentHandler::take)
+                .andRoute(POST("/api/assessments/{assessmentId}/submit"), assessmentHandler::submit)
+                .andRoute(GET("/api/assessments/{assessmentId}/leaderboard"), assessmentHandler::leaderboard)
                 // editing / reordering (PUT, not PATCH — Java's HttpURLConnection can't do PATCH;
                 // "order" routes are registered before the {id} routes so they aren't shadowed)
                 .andRoute(PUT("/api/courses/{courseId}/sections/order"), courseHandler::reorderSections)
