@@ -58,6 +58,7 @@ flowchart TB
 | --- | --- | --- | --- |
 | Database + Auth + file storage | Supabase | Free (500 MB DB, 1 GB files, 50k users) | **$0** |
 | Video hosting + delivery | YouTube / Vimeo | Free (unlisted) | **$0** |
+| Live streaming (ingest + delivery + recording) | YouTube Live | Free | **$0** |
 | Backend hosting | Render / Fly.io | Free web service | **$0** |
 | Source & CI | GitHub / Actions | Free for public repo | **$0** |
 | **Total** | | | **$0 / month** |
@@ -87,6 +88,9 @@ owns only what *must* be server-side and untrusted-by-the-client:
   edit their own courses).
 - **Progress upserts** — the idempotent `(learner, lecture)` write and course-% derivation.
 - **Video linking** — validate/normalize the YouTube/Vimeo id a creator pastes; store it.
+- **Live sessions** — schedule/start/end lifecycle, notify enrolled learners when a session
+  goes live, and archive the recording into a normal lecture. YouTube Live does the actual
+  ingest/delivery/recording; the raw stream key is exposed only to the owning creator.
 
 It stays framework-free in the domain, `JdbcClient` + `schema.sql` against the Supabase
 Postgres, explicit bean wiring — nothing about using Supabase changes that style. Supabase is

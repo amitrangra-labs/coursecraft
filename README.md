@@ -34,6 +34,7 @@ Built to run at **$0/month** for a nonprofit. Full detail and cost table in [doc
 - **Our backend:** Spring Boot (Java), **strict hexagonal** — `domain` / `port` / `adapter/in` / `adapter/out`, explicit bean wiring in `@Configuration` classes, `JdbcClient` + `schema.sql` (no JPA magic). Hosted free (Render/Fly.io). Owns grading, leaderboards, publish rules, progress upserts.
 - **Supabase (free, managed):** PostgreSQL (our schema), Auth (JWT, `learner`/`creator` roles), and Storage for thumbnails — so we don't operate a database.
 - **Video:** **YouTube/Vimeo unlisted embeds** — free hosting + delivery; we store only the video id. (Upgrade path to signed streaming via nonprofit credits if lectures ever need gating.)
+- **Live lectures:** **YouTube Live** — creators broadcast in real time, learners attend, and the recording auto-archives into a normal replay lecture. Free at any audience size; two-way WebRTC seminars are a later upgrade.
 - **Later:** iOS (SwiftUI) + Web (React) reuse the same backend API. See ARCHITECTURE for the cross-platform decision.
 
 ## Rationale for Android-native first

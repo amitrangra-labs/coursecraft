@@ -56,6 +56,8 @@ erDiagram
     ASSESSMENT ||--o{ ATTEMPT : graded_as
     LECTURE ||--o{ PROGRESS : tracked_by
     COURSE ||--o{ ENROLLMENT : enrolled_via
+    COURSE ||--o{ LIVE_SESSION : schedules
+    LIVE_SESSION ||--o| LECTURE : archives_to
     USER {
       uuid id
       string display_name
@@ -68,9 +70,17 @@ erDiagram
     }
     LECTURE {
       uuid id
-      enum type "video|text"
+      enum type "video|text|live_replay"
       string playback_id
       int duration_sec
+    }
+    LIVE_SESSION {
+      uuid id
+      uuid course_id
+      enum status "scheduled|live|ended|canceled"
+      string broadcast_id
+      timestamp starts_at
+      uuid recording_lecture_id
     }
     PROGRESS {
       uuid learner_id
@@ -100,7 +110,7 @@ Matches the house style used across these repos: framework-free domain, no annot
 com.coursecraft
 ├── Application.java
 ├── domain/
-│   ├── service/     # CourseService, ProgressService, AssessmentService, LeaderboardService
+│   ├── service/     # CourseService, ProgressService, AssessmentService, LeaderboardService, LiveSessionService
 │   ├── object/      # Course, Lecture, Progress, Attempt, Question … (plain records)
 │   └── config/      # domain-level value config
 ├── port/            # OUTBOUND interfaces only: CourseStore, ProgressStore,
@@ -139,6 +149,8 @@ Rules carried over from the house style:
 | `PUT /progress` | LJ-2/3 | Idempotent upsert on `(learner, lecture)`. |
 | `POST /assessments/{id}/attempts`, `POST /attempts/{id}/submit` | LJ-4 | Server-side grade & limits. |
 | `GET /assessments/{id}/leaderboard`, `GET /courses/{id}/leaderboard` | LJ-5 | Best-per-learner ranking. |
+| `POST /live-sessions`, `POST /live-sessions/{id}/start`, `POST /live-sessions/{id}/end` | CJ-7 | Schedule / go live / end; ends → archive to a lecture. Stream key returned only to the owning creator. |
+| `GET /live-sessions/{id}`, `GET /courses/{id}/live-sessions` | LJ-7 | Attend: status + embed id; countdown when scheduled, replay when ended. |
 
 ## Android client shape
 

@@ -22,6 +22,7 @@ flowchart LR
       C4(Build assessment)
       C5(Publish)
       C6(View analytics)
+      C7(Host live lecture)
     end
     subgraph Learner["🧑‍🎓 Learner / Student"]
       L1(Discover & enroll)
@@ -30,11 +31,14 @@ flowchart LR
       L4(Take assessment)
       L5(See score & leaderboard)
       L6(Earn completion)
+      L7(Attend live lecture)
     end
     C5 --> L1
     C3 --> L2
     C4 --> L4
     L4 --> L5
+    C7 --> L7
+    C7 -.recording.-> L2
 ```
 
 ---
@@ -148,6 +152,52 @@ published course creates edits in place (MVP) — versioning is a later concern.
 
 Enrollment count, per-lecture completion rate, average assessment score, and the leaderboard
 for their own assessments. Read-only dashboard backed by aggregate queries.
+
+## CJ-7 — Schedule & host a live lecture  ⭐
+
+A live session is a **scheduled event** that learners attend in real time, then becomes an
+on-demand lecture automatically once it ends.
+
+```mermaid
+sequenceDiagram
+    actor T as Teacher
+    participant App as App
+    participant API as Backend API
+    participant YT as YouTube Live
+    T->>App: Schedule live lecture (title, course, start time)
+    App->>API: POST /live-sessions {courseId, startsAt}
+    API->>YT: Create broadcast (Live Streaming API)
+    YT-->>API: broadcast id, RTMP ingest URL + stream key
+    API-->>App: session SCHEDULED, stream key (creator-only)
+    Note over T: At start time — stream via OBS / mobile encoder
+    T->>YT: Push RTMP (OBS / phone)
+    T->>App: Tap "Go live"
+    App->>API: POST /live-sessions/{id}/start
+    API->>API: status LIVE, notify enrolled learners
+    Note over T,YT: Teaches live; learners watch + chat
+    T->>App: Tap "End"
+    App->>API: POST /live-sessions/{id}/end
+    API->>YT: Stop broadcast
+    YT-->>API: auto-archived VOD (playback id)
+    API->>API: status ENDED → create on-demand lecture from the recording
+```
+
+**Notes:** MVP keeps the encoder external (OBS on desktop, or a phone RTMP app) — we don't
+build streaming, YouTube handles ingest, delivery, and recording. The creator can also just
+paste an existing YouTube Live link if they prefer not to use the API. The recording drops
+straight into the course as a normal video lecture (LJ-2 replay + progress works unchanged).
+
+## Live session state machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Scheduled
+    Scheduled --> Live: creator goes live
+    Scheduled --> Canceled: creator cancels
+    Live --> Ended: creator ends
+    Ended --> [*]: recording becomes a VOD lecture
+    Canceled --> [*]
+```
 
 ---
 
@@ -271,6 +321,32 @@ flowchart LR
 
 MVP: a completion badge + shareable summary. Formal certificates are a later phase.
 
+## LJ-7 — Attend a live lecture  ⭐
+
+```mermaid
+sequenceDiagram
+    actor S as Student
+    participant App as App
+    participant API as Backend API
+    participant YT as YouTube Live
+    Note over S: Gets notified when a session goes live
+    S->>App: Open live lecture
+    App->>API: GET /live-sessions/{id}
+    API-->>App: status, YouTube embed id, chat availability
+    alt status == LIVE
+        App->>YT: Embed live player
+        S->>App: Watch in real time + live chat Q&A
+    else status == SCHEDULED
+        App-->>S: Countdown + "Set reminder"
+    else status == ENDED
+        App-->>S: "Watch the recording" → normal lecture (LJ-2)
+    end
+```
+
+**Notes:** live attendance itself isn't graded, but the auto-recording means a learner who
+misses it still gets full progress tracking on the replay. Live chat is YouTube's (MVP);
+a native Q&A is a later phase.
+
 ---
 
 ## Cross-cutting journeys
@@ -280,6 +356,9 @@ MVP: a completion badge + shareable summary. Formal certificates are a later pha
 | Sign up / sign in / sign out | ✅ | OIDC; learner role default, creator upgrade. |
 | Edit profile & display name | ✅ | Display name feeds the leaderboard. |
 | Offline viewing / progress sync | ⚠️ Partial | Progress syncs offline in MVP; full lecture download is a later phase. |
+| Live session reminders / "went live" push | ✅ | Needed for LJ-7 to be useful; push via FCM. |
+| Native in-app live Q&A (vs. YouTube chat) | ❌ Later | MVP uses the provider's live chat. |
+| Two-way / interactive live (WebRTC seminars) | ❌ Later | Not $0 at scale; LiveKit/Jitsi upgrade. |
 | Notifications (new course, result) | ❌ Later | Push via FCM. |
 | Ratings & reviews | ❌ Later | Course quality signal. |
 | Payments / paid courses | ❌ Later | Out of scope for MVP; keep the domain open to it. |
@@ -295,7 +374,10 @@ MVP: a completion badge + shareable summary. Formal certificates are a later pha
    the loop.
 3. **Video never flows through our backend** — direct upload to a provider, we store only
    playback ids and durations.
-4. **Grading and attempt limits are server-authoritative** — the client is untrusted.
-5. **The API is client-agnostic** — Android, iOS, and Web are three clients over one API.
+4. **Live is a scheduled event that recycles into a VOD** — a `LiveSession` has its own
+   lifecycle, and its recording becomes an ordinary video lecture, so replay + progress reuse
+   LJ-2 unchanged. Streaming/ingest/recording are the provider's job, not ours.
+5. **Grading and attempt limits are server-authoritative** — the client is untrusted.
+6. **The API is client-agnostic** — Android, iOS, and Web are three clients over one API.
 
 Next: [ARCHITECTURE.md](ARCHITECTURE.md) turns these into a domain model and modules.

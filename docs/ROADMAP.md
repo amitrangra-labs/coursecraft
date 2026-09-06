@@ -39,6 +39,16 @@ Milestone-based, each phase independently demoable. Journeys referenced by their
 
 **Demo:** two learners take the same assessment and see their ranks on a shared leaderboard.
 
+## Phase 3.5 — Live lectures
+
+- [ ] `LiveSession` lifecycle: schedule → live → ended/canceled (CJ-7).
+- [ ] YouTube Live integration: create broadcast (or paste-a-link fallback), embed player.
+- [ ] "Went live" push + reminders; learner attend screen with countdown/live/replay (LJ-7).
+- [ ] Auto-archive the recording into a normal video lecture (reuses LJ-2 replay + progress).
+
+**Demo:** a teacher goes live, learners join and chat, and the recording appears as a replay
+lecture afterward.
+
 ## Phase 4 — Polish & MVP hardening
 
 - [ ] Creator analytics dashboard (CJ-6).
@@ -55,6 +65,8 @@ Milestone-based, each phase independently demoable. Journeys referenced by their
 - Full offline lecture download; push notifications (FCM); ratings & reviews;
   free-text/AI-graded questions; certificates; payments; cohorts/friends leaderboards;
   moderation.
+- Interactive two-way live (WebRTC seminars via LiveKit/Jitsi) and native in-app live Q&A —
+  when the budget or nonprofit credits can cover real-time infra.
 
 ## Suggested build order rationale
 
