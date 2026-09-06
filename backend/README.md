@@ -64,7 +64,9 @@ The repo ships a Render Blueprint ([`../render.yaml`](../render.yaml)) + a
 [`Dockerfile`](Dockerfile). In Render: **New → Blueprint**, point at this repo, then set these
 env vars in the dashboard (they're `sync:false`, so Render prompts and never stores them in git):
 `DATABASE_URL`, `DATABASE_USER`, `DATABASE_PASSWORD`, `SUPABASE_JWKS_URI`, `SUPABASE_JWT_ISSUER`.
-Render injects `PORT` and health-checks `/api/health`. Free instances sleep after ~15 min idle
+Render injects `PORT` and health-checks `/api/health`. **Use the Supabase Session pooler
+connection here** — Render is IPv4-only and the direct `db.<ref>.supabase.co` host is IPv6-only
+on the free tier (see `.env.example` for the pooler URL form). Free instances sleep after ~15 min idle
 (slow first request) — a keep-alive ping avoids it. Fly.io is a drop-in alternative later (same
 Dockerfile), best paired with a GraalVM native image for its smaller memory.
 
