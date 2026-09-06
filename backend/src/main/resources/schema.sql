@@ -45,3 +45,12 @@ CREATE TABLE IF NOT EXISTS lecture (
     created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_lecture_section ON lecture (section_id);
+
+CREATE TABLE IF NOT EXISTS enrollment (
+    id          UUID PRIMARY KEY,
+    learner_id  UUID NOT NULL REFERENCES app_user (id),
+    course_id   UUID NOT NULL REFERENCES course (id) ON DELETE CASCADE,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (learner_id, course_id)
+);
+CREATE INDEX IF NOT EXISTS idx_enrollment_learner ON enrollment (learner_id);

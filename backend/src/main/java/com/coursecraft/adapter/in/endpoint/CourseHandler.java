@@ -7,6 +7,7 @@ import com.coursecraft.domain.object.Lecture;
 import com.coursecraft.domain.object.Section;
 import com.coursecraft.domain.object.User;
 import com.coursecraft.domain.service.CourseService;
+import com.coursecraft.domain.service.EnrollmentService;
 import com.coursecraft.domain.service.ProfileService;
 import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
@@ -22,10 +23,13 @@ public final class CourseHandler {
 
     private final ProfileService profileService;
     private final CourseService courseService;
+    private final EnrollmentService enrollmentService;
 
-    public CourseHandler(ProfileService profileService, CourseService courseService) {
+    public CourseHandler(ProfileService profileService, CourseService courseService,
+                         EnrollmentService enrollmentService) {
         this.profileService = profileService;
         this.courseService = courseService;
+        this.enrollmentService = enrollmentService;
     }
 
     // --- creator ---
@@ -138,7 +142,24 @@ public final class CourseHandler {
     public ServerResponse courseDetail(ServerRequest request) {
         User user = currentUser(request);
         UUID courseId = uuid(request, "courseId");
-        return ServerResponse.ok().body(CourseDetailView.from(courseService.getDetail(user, courseId)));
+        boolean enrolled = enrollmentService.isEnrolled(user, courseId);
+        return ServerResponse.ok().body(
+                CourseDetailView.from(courseService.getDetail(user, courseId), enrolled));
+    }
+
+    public ServerResponse enroll(ServerRequest request) {
+        enrollmentService.enroll(currentUser(request), uuid(request, "courseId"));
+        return ok();
+    }
+
+    public ServerResponse unenroll(ServerRequest request) {
+        enrollmentService.unenroll(currentUser(request), uuid(request, "courseId"));
+        return ok();
+    }
+
+    public ServerResponse myLearning(ServerRequest request) {
+        return ServerResponse.ok().body(enrollmentService.myLearning(currentUser(request)).stream()
+                .map(CourseSummary::from).toList());
     }
 
     // --- helpers ---
@@ -204,12 +225,12 @@ public final class CourseHandler {
         }
     }
 
-    public record CourseDetailView(CourseSummary course, List<SectionView> sections) {
-        static CourseDetailView from(CourseDetail detail) {
+    public record CourseDetailView(CourseSummary course, List<SectionView> sections, boolean enrolled) {
+        static CourseDetailView from(CourseDetail detail, boolean enrolled) {
             List<SectionView> sections = detail.sections().stream()
                     .map(sw -> SectionView.from(sw.section(), sw.lectures()))
                     .toList();
-            return new CourseDetailView(CourseSummary.from(detail.course()), sections);
+            return new CourseDetailView(CourseSummary.from(detail.course()), sections, enrolled);
         }
     }
 }

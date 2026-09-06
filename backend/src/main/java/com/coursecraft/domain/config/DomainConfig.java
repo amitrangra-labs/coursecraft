@@ -1,8 +1,10 @@
 package com.coursecraft.domain.config;
 
 import com.coursecraft.domain.service.CourseService;
+import com.coursecraft.domain.service.EnrollmentService;
 import com.coursecraft.domain.service.ProfileService;
 import com.coursecraft.port.CourseStore;
+import com.coursecraft.port.EnrollmentStore;
 import com.coursecraft.port.UserStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,5 +25,10 @@ public class DomainConfig {
     @Bean
     CourseService courseService(CourseStore courseStore) {
         return new CourseService(courseStore);
+    }
+
+    @Bean
+    EnrollmentService enrollmentService(EnrollmentStore enrollmentStore, CourseStore courseStore) {
+        return new EnrollmentService(enrollmentStore, courseStore);
     }
 }

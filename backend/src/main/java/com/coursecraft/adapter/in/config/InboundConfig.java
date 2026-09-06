@@ -6,6 +6,7 @@ import com.coursecraft.adapter.in.endpoint.HealthHandler;
 import com.coursecraft.adapter.in.endpoint.MeHandler;
 import com.coursecraft.adapter.in.error.ErrorMapping;
 import com.coursecraft.domain.service.CourseService;
+import com.coursecraft.domain.service.EnrollmentService;
 import com.coursecraft.domain.service.ProfileService;
 import com.coursecraft.port.TokenVerifier;
 import org.springframework.context.annotation.Bean;
@@ -39,8 +40,9 @@ public class InboundConfig {
     }
 
     @Bean
-    CourseHandler courseHandler(ProfileService profileService, CourseService courseService) {
-        return new CourseHandler(profileService, courseService);
+    CourseHandler courseHandler(ProfileService profileService, CourseService courseService,
+                                EnrollmentService enrollmentService) {
+        return new CourseHandler(profileService, courseService, enrollmentService);
     }
 
     @Bean
@@ -71,6 +73,10 @@ public class InboundConfig {
                         courseHandler::addLecture)
                 .andRoute(POST("/api/courses/{courseId}/sections"), courseHandler::addSection)
                 .andRoute(POST("/api/courses/{courseId}/publish"), courseHandler::publish)
+                // enrollment (LJ-1)
+                .andRoute(GET("/api/my/learning"), courseHandler::myLearning)
+                .andRoute(POST("/api/courses/{courseId}/enroll"), courseHandler::enroll)
+                .andRoute(DELETE("/api/courses/{courseId}/enroll"), courseHandler::unenroll)
                 // editing / reordering (PUT, not PATCH — Java's HttpURLConnection can't do PATCH;
                 // "order" routes are registered before the {id} routes so they aren't shadowed)
                 .andRoute(PUT("/api/courses/{courseId}/sections/order"), courseHandler::reorderSections)
