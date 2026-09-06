@@ -3,10 +3,53 @@
 How we publish the Android app, the iOS app, and where the web app is hosted — with the
 nonprofit / $0 angle for each. (Verified against 2026 program terms; see sources at the end.)
 
+## MVP distribution: sideloaded, portable APKs (no store)
+
+For the MVP we do **not** publish to any store. We ship a **portable, signed APK** that can be
+manually installed and verified on a real Android phone. This keeps the MVP at **literal $0**
+(not even the one-time Google $25) and makes every build testable on-device immediately.
+
+- **Artifact:** a **signed universal release APK** — one file that installs across ABIs
+  (arm64, armeabi-v7a, x86_64), so it's portable across phones. (An AAB is *not* used here —
+  that format is only for Play Store upload.)
+- **Signing:** a dedicated **release keystore**; the key lives in **GitHub Actions secrets**,
+  never in the repo. Every APK is signed with the same key so upgrades install over each
+  other.
+- **Distribution channel ($0):** attach the APK to a **GitHub Release** (tagged, e.g.
+  `v0.1.0-mvp`). Public repo → anyone with the link can download it. CI builds + signs +
+  uploads on every tag.
+- **Install on a phone:** enable **"Install unknown apps"** for the browser/file manager,
+  download the APK, tap to install — or `adb install coursecraft-v0.1.0.apk` over USB.
+- **Verify it's genuine:** the release notes publish the APK's **SHA-256 fingerprint** and the
+  **signing certificate fingerprint**; a recipient checks `sha256sum` (or
+  `apksigner verify --print-certs`) before installing.
+
+```mermaid
+flowchart LR
+    A[git tag v0.x.y] --> B[GitHub Actions]
+    B --> C[Gradle: assembleRelease<br/>universal APK]
+    C --> D[Sign with release keystore]
+    D --> E[Publish SHA-256 + cert fingerprint]
+    D --> F[Attach APK to GitHub Release]
+    F --> G[Download on phone]
+    G --> H[Install unknown apps → tap<br/>or adb install]
+    H --> I[Verify on device]
+```
+
+**2026 note:** Google's developer-verification decree (from Sept 2026) will eventually tie
+even sideloaded apps to a registered developer identity. For MVP testing on our own / pilot
+devices this is fine; store registration is only needed when we move to public distribution
+(below).
+
+## Post-MVP: store publishing & web hosting
+
+Everything below applies **after** the MVP, when moving from sideloaded APKs to public stores.
+
 ## Cost summary
 
 | Client | Channel | Cost | Nonprofit angle |
 | --- | --- | --- | --- |
+| **Android (MVP)** | **Sideloaded signed APK via GitHub Releases** | **$0** | No store, no fee — manual install + verify on device. |
 | **Android** | Google Play | **$25 one-time** | No nonprofit fee waiver; $25 is a one-off, not annual. |
 | **iOS** | App Store (Apple Developer Program) | $99/yr → **$0 with waiver** | Nonprofit fee waiver zeroes the annual fee (conditions below). |
 | **Web** | Static host (Cloudflare Pages / GitHub Pages / Netlify) | **$0** | Free tiers cover it entirely. |

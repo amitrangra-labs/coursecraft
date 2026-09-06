@@ -10,8 +10,12 @@ Milestone-based, each phase independently demoable. Journeys referenced by their
 - [ ] OIDC integration; issue/verify JWT; `learner` role default.
 - [ ] Android app skeleton: Compose, navigation, auth sign-in (LJ sign-in, CJ-1).
 - [ ] CI: build + test for backend and Android.
+- [ ] **Signed universal release APK** produced by CI and attached to a **GitHub Release**,
+      with published SHA-256 + signing-cert fingerprints (release keystore in Actions
+      secrets). This is the MVP distribution channel — see [DISTRIBUTION.md](DISTRIBUTION.md).
 
-**Demo:** sign in on Android, hit an authenticated backend endpoint.
+**Demo:** download the APK from a GitHub Release, sideload it on a real phone, sign in, and
+hit an authenticated backend endpoint.
 
 ## Phase 1 — Creator authoring (video pipeline)
 
@@ -56,9 +60,10 @@ lecture afterward.
 - [ ] Error/empty/loading states, accessibility, offline messaging.
 - [ ] Observability: metrics + structured logs; basic load test on leaderboard/progress.
 
-**MVP done** = Phases 0–4 on Android — **live lectures (Phase 3.5) are in scope for the MVP**,
-not a later add-on. The only live-related items deferred past MVP are native in-app Q&A and
-two-way WebRTC seminars.
+**MVP done** = Phases 0–4 on Android, **delivered as a sideloadable signed APK** (no store) —
+and **live lectures (Phase 3.5) are in scope for the MVP**, not a later add-on. The only
+live-related items deferred past MVP are native in-app Q&A and two-way WebRTC seminars. Store
+publishing (Google Play / App Store) and the web client are post-MVP.
 
 ## Phase 5+ — Beyond MVP
 
