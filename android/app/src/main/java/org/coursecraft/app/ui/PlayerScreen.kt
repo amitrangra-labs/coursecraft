@@ -1,6 +1,7 @@
 package org.coursecraft.app.ui
 
 import android.annotation.SuppressLint
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Column
@@ -33,14 +34,19 @@ fun PlayerScreen(videoId: String, title: String, onBack: () -> Unit) {
             factory = { context ->
                 WebView(context).apply {
                     settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
                     settings.mediaPlaybackRequiresUserGesture = false
+                    // A WebChromeClient is required for the YouTube IFrame video surface to render
+                    // (without it the player stays black).
+                    webChromeClient = WebChromeClient()
                     webViewClient = WebViewClient()
                     val html = """
-                        <html><body style="margin:0;background:#000">
+                        <html style="height:100%">
+                        <body style="height:100%;margin:0;background:#000">
                           <iframe width="100%" height="100%"
-                                  src="https://www.youtube.com/embed/$videoId?playsinline=1"
+                                  src="https://www.youtube.com/embed/$videoId?playsinline=1&autoplay=1"
                                   frameborder="0" allowfullscreen
-                                  allow="autoplay; encrypted-media"></iframe>
+                                  allow="autoplay; encrypted-media; fullscreen"></iframe>
                         </body></html>
                     """.trimIndent()
                     loadDataWithBaseURL("https://www.youtube.com", html, "text/html", "utf-8", null)

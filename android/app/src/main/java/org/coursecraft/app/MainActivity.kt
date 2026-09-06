@@ -5,6 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -16,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import org.coursecraft.app.ui.CourseDetailScreen
 import org.coursecraft.app.ui.CourseListScreen
 import org.coursecraft.app.ui.CreateCourseScreen
@@ -55,6 +59,7 @@ fun CourseCraftApp() {
 
     BackHandler(enabled = backStack.size > 1) { back() }
 
+    Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
     when (val screen = backStack.last()) {
         Screen.Home -> HomeScreen(
             accessToken = token,
@@ -111,6 +116,7 @@ fun CourseCraftApp() {
             title = screen.title,
             onBack = { back() }
         )
+    }
     }
 }
 
