@@ -39,7 +39,7 @@ Milestone-based, each phase independently demoable. Journeys referenced by their
 
 **Demo:** two learners take the same assessment and see their ranks on a shared leaderboard.
 
-## Phase 3.5 — Live lectures
+## Phase 3.5 — Live lectures  (MVP)
 
 - [ ] `LiveSession` lifecycle: schedule → live → ended/canceled (CJ-7).
 - [ ] YouTube Live integration: create broadcast (or paste-a-link fallback), embed player.
@@ -56,7 +56,9 @@ lecture afterward.
 - [ ] Error/empty/loading states, accessibility, offline messaging.
 - [ ] Observability: metrics + structured logs; basic load test on leaderboard/progress.
 
-**MVP done** = Phases 0–4 on Android.
+**MVP done** = Phases 0–4 on Android — **live lectures (Phase 3.5) are in scope for the MVP**,
+not a later add-on. The only live-related items deferred past MVP are native in-app Q&A and
+two-way WebRTC seminars.
 
 ## Phase 5+ — Beyond MVP
 

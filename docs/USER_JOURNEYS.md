@@ -153,7 +153,7 @@ published course creates edits in place (MVP) — versioning is a later concern.
 Enrollment count, per-lecture completion rate, average assessment score, and the leaderboard
 for their own assessments. Read-only dashboard backed by aggregate queries.
 
-## CJ-7 — Schedule & host a live lecture  ⭐
+## CJ-7 — Schedule & host a live lecture  ⭐ (MVP)
 
 A live session is a **scheduled event** that learners attend in real time, then becomes an
 on-demand lecture automatically once it ends.
@@ -321,7 +321,7 @@ flowchart LR
 
 MVP: a completion badge + shareable summary. Formal certificates are a later phase.
 
-## LJ-7 — Attend a live lecture  ⭐
+## LJ-7 — Attend a live lecture  ⭐ (MVP)
 
 ```mermaid
 sequenceDiagram
