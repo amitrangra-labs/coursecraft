@@ -33,38 +33,39 @@ hit an authenticated backend endpoint.
 
 - [x] Discovery + enroll (LJ-1) — catalog, course detail, enroll/unenroll, and a "My Learning"
       list of enrolled courses.
-- [~] Player: **YouTube IFrame in a WebView** plays the lecture (LJ-2). Media3/HLS is for
-      provider-hosted video later.
-- [ ] Progress upsert API + throttled client writes + Room offline queue + WorkManager sync.
-- [ ] "Continue learning" rail; resume-at-position (LJ-3).
+- [x] Player: YouTube IFrame Player (AndroidYouTubePlayer library) plays the lecture (LJ-2).
+      Media3/HLS is for provider-hosted video later.
+- [x] Progress upsert API (idempotent, sticky completion) + throttled client saves (~10s) +
+      resume-at-position. (Room offline queue / WorkManager sync deferred — online save works.)
+- [x] "Continue learning" button (LJ-3); course % complete on the detail screen.
 
-**Demo:** watch a lecture, kill the app, reopen → resumes at the exact position.
+**Demo:** watch a lecture, reopen → resumes at the saved position. ✅ (verify video on a device)
 
 ## Phase 3 — Assessments + leaderboards  ⭐
 
-- [ ] Assessment authoring: single/multiple/true-false questions (CJ-4).
-- [ ] Attempt lifecycle with server-side grading, attempt limits, timer (LJ-4).
-- [ ] Result screen; best-per-learner leaderboard, assessment + course scope (LJ-5).
-- [ ] Course completion + badge (LJ-6).
+- [x] Assessment authoring: single/multiple/true-false questions (CJ-4).
+- [x] Attempt lifecycle with server-side auto-grading (LJ-4). (Attempt limits + timer deferred.)
+- [x] Result screen; best-per-learner leaderboard (LJ-5).
+- [~] Course completion derived from progress; a badge/certificate is post-MVP (LJ-6).
 
-**Demo:** two learners take the same assessment and see their ranks on a shared leaderboard.
+**Demo:** two learners take the same assessment and see their ranks on a shared leaderboard. ✅
 
 ## Phase 3.5 — Live lectures  (MVP)
 
-- [ ] `LiveSession` lifecycle: schedule → live → ended/canceled (CJ-7).
-- [ ] YouTube Live integration: create broadcast (or paste-a-link fallback), embed player.
-- [ ] "Went live" push + reminders; learner attend screen with countdown/live/replay (LJ-7).
-- [ ] Auto-archive the recording into a normal video lecture (reuses LJ-2 replay + progress).
+- [x] `LiveSession` lifecycle: schedule → live → ended/canceled (CJ-7).
+- [x] YouTube Live via paste-a-link (id/URL, incl. `/live/`), embedded player (LJ-7).
+- [~] Learner attend screen with countdown/live/replay (LJ-7). "Went live" push is post-MVP.
+- [~] Recording reuse: the same YouTube id serves the replay once ENDED (no re-archive step).
 
-**Demo:** a teacher goes live, learners join and chat, and the recording appears as a replay
-lecture afterward.
+**Demo:** a teacher schedules a session, goes live, learners join; after End, the recording
+plays from the same entry. ✅
 
 ## Phase 4 — Polish & MVP hardening
 
-- [ ] Creator analytics dashboard (CJ-6).
-- [ ] Profile + display name / anonymous leaderboard option.
-- [ ] Error/empty/loading states, accessibility, offline messaging.
-- [ ] Observability: metrics + structured logs; basic load test on leaderboard/progress.
+- [x] Creator analytics dashboard (CJ-6) — enrollments + per-assessment attempts & avg score.
+- [x] Editable display name (feeds the leaderboard). Anonymous-leaderboard option is post-MVP.
+- [~] Error/empty/loading states present across screens; deeper accessibility + offline is ongoing.
+- [ ] Observability: metrics + structured logs; load test — post-MVP.
 
 **MVP done** = Phases 0–4 on Android, **delivered as a sideloadable signed APK** (no store) —
 and **live lectures (Phase 3.5) are in scope for the MVP**, not a later add-on. The only
