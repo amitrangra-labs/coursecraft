@@ -3,11 +3,13 @@ package com.coursecraft.domain.config;
 import com.coursecraft.domain.service.AssessmentService;
 import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.EnrollmentService;
+import com.coursecraft.domain.service.LiveSessionService;
 import com.coursecraft.domain.service.ProfileService;
 import com.coursecraft.domain.service.ProgressService;
 import com.coursecraft.port.AssessmentStore;
 import com.coursecraft.port.CourseStore;
 import com.coursecraft.port.EnrollmentStore;
+import com.coursecraft.port.LiveSessionStore;
 import com.coursecraft.port.ProgressStore;
 import com.coursecraft.port.UserStore;
 import org.springframework.context.annotation.Bean;
@@ -44,5 +46,10 @@ public class DomainConfig {
     @Bean
     ProgressService progressService(ProgressStore progressStore, CourseStore courseStore) {
         return new ProgressService(progressStore, courseStore);
+    }
+
+    @Bean
+    LiveSessionService liveSessionService(LiveSessionStore liveSessionStore, CourseStore courseStore) {
+        return new LiveSessionService(liveSessionStore, courseStore);
     }
 }

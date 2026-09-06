@@ -4,12 +4,14 @@ import com.coursecraft.adapter.in.auth.RequestAuth;
 import com.coursecraft.adapter.in.endpoint.AssessmentHandler;
 import com.coursecraft.adapter.in.endpoint.CourseHandler;
 import com.coursecraft.adapter.in.endpoint.HealthHandler;
+import com.coursecraft.adapter.in.endpoint.LiveHandler;
 import com.coursecraft.adapter.in.endpoint.MeHandler;
 import com.coursecraft.adapter.in.endpoint.ProgressHandler;
 import com.coursecraft.adapter.in.error.ErrorMapping;
 import com.coursecraft.domain.service.AssessmentService;
 import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.EnrollmentService;
+import com.coursecraft.domain.service.LiveSessionService;
 import com.coursecraft.domain.service.ProfileService;
 import com.coursecraft.domain.service.ProgressService;
 import com.coursecraft.port.TokenVerifier;
@@ -60,6 +62,11 @@ public class InboundConfig {
     }
 
     @Bean
+    LiveHandler liveHandler(ProfileService profileService, LiveSessionService liveSessionService) {
+        return new LiveHandler(profileService, liveSessionService);
+    }
+
+    @Bean
     RequestAuth requestAuth(TokenVerifier tokenVerifier) {
         return new RequestAuth(tokenVerifier);
     }
@@ -79,6 +86,7 @@ public class InboundConfig {
     RouterFunction<ServerResponse> securedRoutes(MeHandler meHandler, CourseHandler courseHandler,
                                                  AssessmentHandler assessmentHandler,
                                                  ProgressHandler progressHandler,
+                                                 LiveHandler liveHandler,
                                                  RequestAuth requestAuth) {
         return route(GET("/api/me"), meHandler::me)
                 .andRoute(POST("/api/creators"), meHandler::becomeCreator)
@@ -105,6 +113,12 @@ public class InboundConfig {
                 .andRoute(GET("/api/my/continue"), progressHandler::continueLearning)
                 .andRoute(GET("/api/lectures/{lectureId}/progress"), progressHandler::get)
                 .andRoute(GET("/api/courses/{courseId}/progress"), progressHandler::courseProgress)
+                // live lectures (CJ-7, LJ-7)
+                .andRoute(POST("/api/courses/{courseId}/live"), liveHandler::schedule)
+                .andRoute(GET("/api/courses/{courseId}/live"), liveHandler::listForCourse)
+                .andRoute(POST("/api/live/{sessionId}/start"), liveHandler::goLive)
+                .andRoute(POST("/api/live/{sessionId}/end"), liveHandler::end)
+                .andRoute(POST("/api/live/{sessionId}/cancel"), liveHandler::cancel)
                 // editing / reordering (PUT, not PATCH — Java's HttpURLConnection can't do PATCH;
                 // "order" routes are registered before the {id} routes so they aren't shadowed)
                 .andRoute(PUT("/api/courses/{courseId}/sections/order"), courseHandler::reorderSections)

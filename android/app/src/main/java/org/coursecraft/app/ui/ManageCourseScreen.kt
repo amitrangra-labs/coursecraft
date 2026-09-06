@@ -38,6 +38,7 @@ fun ManageCourseScreen(
     courseId: String,
     title: String,
     onOpenAssessments: () -> Unit,
+    onOpenLive: () -> Unit,
     onDeleted: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -156,6 +157,10 @@ fun ManageCourseScreen(
 
             OutlinedButton(onClick = onOpenAssessments, modifier = Modifier.fillMaxWidth()) {
                 Text("Manage assessments")
+            }
+
+            OutlinedButton(onClick = onOpenLive, modifier = Modifier.fillMaxWidth()) {
+                Text("Live sessions")
             }
 
             Button(onClick = { submit { CourseApi.publish(accessToken, courseId) } }, modifier = Modifier.fillMaxWidth()) {

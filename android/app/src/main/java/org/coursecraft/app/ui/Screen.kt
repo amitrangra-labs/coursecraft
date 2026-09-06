@@ -17,4 +17,8 @@ sealed interface Screen {
     data class LearnerAssessments(val courseId: String, val title: String) : Screen
     data class TakeAssessment(val assessmentId: String, val title: String) : Screen
     data class Leaderboard(val assessmentId: String, val title: String) : Screen
+
+    // Live lectures (Phase 3.5)
+    data class CreatorLive(val courseId: String, val title: String) : Screen
+    data class LearnerLive(val courseId: String, val title: String) : Screen
 }

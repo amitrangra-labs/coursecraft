@@ -51,7 +51,13 @@ fun PlayerScreen(
                         private var lastSavedSec = -100
                         private var markedComplete = false
 
+                        private val trackProgress = lectureId.isNotBlank()
+
                         override fun onReady(youTubePlayer: YouTubePlayer) {
+                            if (!trackProgress) {
+                                youTubePlayer.cueVideo(videoId, 0f)
+                                return
+                            }
                             io.launch {
                                 val start = try {
                                     CourseApi.getProgress(accessToken, lectureId).positionSec.toFloat()
@@ -67,6 +73,7 @@ fun PlayerScreen(
                         }
 
                         override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                            if (!trackProgress) return
                             val sec = second.toInt()
                             val nearEnd = duration > 0 && second / duration >= 0.95f
                             if (sec - lastSavedSec >= 10 || (nearEnd && !markedComplete)) {

@@ -25,7 +25,9 @@ import org.coursecraft.app.ui.CourseDetailScreen
 import org.coursecraft.app.ui.CourseListScreen
 import org.coursecraft.app.ui.CreateCourseScreen
 import org.coursecraft.app.ui.CreatorAssessmentsScreen
+import org.coursecraft.app.ui.CreatorLiveScreen
 import org.coursecraft.app.ui.HomeScreen
+import org.coursecraft.app.ui.LearnerLiveScreen
 import org.coursecraft.app.ui.LeaderboardScreen
 import org.coursecraft.app.ui.LearnerAssessmentsScreen
 import org.coursecraft.app.ui.ManageCourseScreen
@@ -115,6 +117,7 @@ fun CourseCraftApp() {
             title = screen.title,
             onPlay = { navigate(Screen.Player(it.videoId ?: "", it.title, it.id)) },
             onOpenAssessments = { navigate(Screen.LearnerAssessments(screen.courseId, screen.title)) },
+            onOpenLive = { navigate(Screen.LearnerLive(screen.courseId, screen.title)) },
             onBack = { back() }
         )
 
@@ -123,6 +126,7 @@ fun CourseCraftApp() {
             courseId = screen.courseId,
             title = screen.title,
             onOpenAssessments = { navigate(Screen.CreatorAssessments(screen.courseId, screen.title)) },
+            onOpenLive = { navigate(Screen.CreatorLive(screen.courseId, screen.title)) },
             onDeleted = { back() },
             onBack = { back() }
         )
@@ -171,6 +175,22 @@ fun CourseCraftApp() {
             accessToken = token,
             assessmentId = screen.assessmentId,
             title = screen.title,
+            onBack = { back() }
+        )
+
+        is Screen.CreatorLive -> CreatorLiveScreen(
+            accessToken = token,
+            courseId = screen.courseId,
+            title = screen.title,
+            onOpenVideo = { navigate(Screen.Player(it.videoId, it.title, "")) },
+            onBack = { back() }
+        )
+
+        is Screen.LearnerLive -> LearnerLiveScreen(
+            accessToken = token,
+            courseId = screen.courseId,
+            title = screen.title,
+            onOpenVideo = { navigate(Screen.Player(it.videoId, it.title, "")) },
             onBack = { back() }
         )
     }

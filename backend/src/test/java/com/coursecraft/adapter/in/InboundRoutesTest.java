@@ -7,6 +7,7 @@ import com.coursecraft.domain.object.VerifiedToken;
 import com.coursecraft.domain.service.AssessmentService;
 import com.coursecraft.domain.service.CourseService;
 import com.coursecraft.domain.service.EnrollmentService;
+import com.coursecraft.domain.service.LiveSessionService;
 import com.coursecraft.domain.service.ProfileService;
 import com.coursecraft.domain.service.ProgressService;
 import com.coursecraft.port.CourseStore;
@@ -15,6 +16,7 @@ import com.coursecraft.port.UserStore;
 import com.coursecraft.testsupport.InMemoryAssessmentStore;
 import com.coursecraft.testsupport.InMemoryCourseStore;
 import com.coursecraft.testsupport.InMemoryEnrollmentStore;
+import com.coursecraft.testsupport.InMemoryLiveSessionStore;
 import com.coursecraft.testsupport.InMemoryProgressStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,6 +130,11 @@ class InboundRoutesTest {
         @Bean
         ProgressService progressService(CourseStore courseStore) {
             return new ProgressService(new InMemoryProgressStore(), courseStore);
+        }
+
+        @Bean
+        LiveSessionService liveSessionService(CourseStore courseStore) {
+            return new LiveSessionService(new InMemoryLiveSessionStore(), courseStore);
         }
 
         @Bean

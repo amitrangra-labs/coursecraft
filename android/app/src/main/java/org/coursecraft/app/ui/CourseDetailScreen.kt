@@ -35,6 +35,7 @@ fun CourseDetailScreen(
     title: String,
     onPlay: (LectureView) -> Unit,
     onOpenAssessments: () -> Unit,
+    onOpenLive: () -> Unit,
     onBack: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -91,6 +92,10 @@ fun CourseDetailScreen(
 
                 OutlinedButton(onClick = onOpenAssessments, modifier = Modifier.fillMaxWidth()) {
                     Text("Assessments & leaderboards")
+                }
+
+                OutlinedButton(onClick = onOpenLive, modifier = Modifier.fillMaxWidth()) {
+                    Text("Live sessions")
                 }
 
                 d.sections.forEach { section ->

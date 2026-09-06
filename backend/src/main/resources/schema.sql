@@ -104,3 +104,15 @@ CREATE TABLE IF NOT EXISTS progress (
     PRIMARY KEY (learner_id, lecture_id)
 );
 CREATE INDEX IF NOT EXISTS idx_progress_learner ON progress (learner_id, updated_at DESC);
+
+-- Live lectures (Phase 3.5): scheduled YouTube Live sessions.
+CREATE TABLE IF NOT EXISTS live_session (
+    id               UUID PRIMARY KEY,
+    course_id        UUID NOT NULL REFERENCES course (id) ON DELETE CASCADE,
+    title            TEXT NOT NULL,
+    youtube_video_id TEXT NOT NULL,
+    status           TEXT NOT NULL DEFAULT 'SCHEDULED', -- SCHEDULED|LIVE|ENDED|CANCELED
+    starts_at        TIMESTAMPTZ NOT NULL,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_live_course ON live_session (course_id);
