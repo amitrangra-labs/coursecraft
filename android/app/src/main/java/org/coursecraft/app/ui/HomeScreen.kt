@@ -5,30 +5,34 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.coursecraft.app.data.BackendClient
+import org.coursecraft.app.data.ContinueItem
 import org.coursecraft.app.data.CourseApi
 import org.json.JSONObject
 
 /**
- * Signed-in hub. Shows the profile and routes to the learner catalog and (for creators) their
- * course management. Learners can upgrade to creator here (journey CJ-1).
+ * Signed-in hub. Loads the profile; if that fails because the session is no longer valid it drops
+ * back to sign-in, and "Sign out" is always reachable so a stale session is never a dead end.
  */
 @Composable
 fun HomeScreen(
@@ -41,7 +45,7 @@ fun HomeScreen(
     var role by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
-    var continueItem by remember { mutableStateOf<org.coursecraft.app.data.ContinueItem?>(null) }
+    var continueItem by remember { mutableStateOf<ContinueItem?>(null) }
     var editingName by remember { mutableStateOf(false) }
 
     LaunchedEffect(accessToken) {
@@ -50,7 +54,13 @@ fun HomeScreen(
             displayName = json.optString("displayName")
             role = json.optString("role")
         } catch (e: Exception) {
-            error = e.message
+            val msg = e.message ?: "Could not load your profile"
+            // A stale/expired session (401) means the token is no longer usable — sign out.
+            if (msg.contains("401") || msg.contains("unauthorized", ignoreCase = true)) {
+                onSignOut()
+                return@LaunchedEffect
+            }
+            error = msg
         }
         continueItem = try {
             CourseApi.continueLearning(accessToken)
@@ -68,56 +78,53 @@ fun HomeScreen(
     ) {
         if (role == null && error == null) {
             CircularProgressIndicator()
-            return@Column
-        }
-
-        Text("Hi, $displayName", style = MaterialTheme.typography.headlineSmall)
-        Text("Role: ${role ?: "?"}", style = MaterialTheme.typography.bodyMedium)
-        androidx.compose.material3.TextButton(onClick = { editingName = true }) { Text("Edit name") }
-
-        continueItem?.let { c ->
-            Button(
-                onClick = { onNavigate(Screen.Player(c.videoId, c.lectureTitle, c.lectureId)) },
-                modifier = Modifier.fillMaxWidth()
-            ) { Text("▶ Continue: ${c.lectureTitle}") }
-        }
-
-        Button(onClick = { onNavigate(Screen.Catalog) }, modifier = Modifier.fillMaxWidth()) {
-            Text("Browse courses")
-        }
-        Button(onClick = { onNavigate(Screen.MyLearning) }, modifier = Modifier.fillMaxWidth()) {
-            Text("My Learning")
-        }
-
-        if (role == "CREATOR") {
-            Button(onClick = { onNavigate(Screen.MyCourses) }, modifier = Modifier.fillMaxWidth()) {
-                Text("My courses")
-            }
-            OutlinedButton(onClick = { onNavigate(Screen.CreateCourse) }, modifier = Modifier.fillMaxWidth()) {
-                Text("Create a course")
-            }
         } else {
-            OutlinedButton(
-                onClick = {
-                    busy = true
-                    error = null
-                    scope.launch {
-                        try {
-                            role = CourseApi.becomeCreator(accessToken)
-                        } catch (e: Exception) {
-                            error = e.message
-                        } finally {
-                            busy = false
+            Text("Hi, ${displayName.ifBlank { "there" }}", style = MaterialTheme.typography.headlineSmall)
+            role?.let { Text("Role: $it", style = MaterialTheme.typography.bodyMedium) }
+            TextButton(onClick = { editingName = true }) { Text("Edit name") }
+
+            continueItem?.let { c ->
+                Button(
+                    onClick = { onNavigate(Screen.Player(c.videoId, c.lectureTitle, c.lectureId)) },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("▶ Continue: ${c.lectureTitle}") }
+            }
+
+            Button(onClick = { onNavigate(Screen.Catalog) }, modifier = Modifier.fillMaxWidth()) {
+                Text("Browse courses")
+            }
+            Button(onClick = { onNavigate(Screen.MyLearning) }, modifier = Modifier.fillMaxWidth()) {
+                Text("My Learning")
+            }
+
+            if (role == "CREATOR") {
+                Button(onClick = { onNavigate(Screen.MyCourses) }, modifier = Modifier.fillMaxWidth()) {
+                    Text("My courses")
+                }
+                OutlinedButton(onClick = { onNavigate(Screen.CreateCourse) }, modifier = Modifier.fillMaxWidth()) {
+                    Text("Create a course")
+                }
+            } else if (role == "LEARNER") {
+                OutlinedButton(
+                    onClick = {
+                        busy = true; error = null
+                        scope.launch {
+                            try {
+                                role = CourseApi.becomeCreator(accessToken)
+                            } catch (e: Exception) {
+                                error = e.message
+                            } finally {
+                                busy = false
+                            }
                         }
-                    }
-                },
-                enabled = !busy,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Become a creator")
+                    },
+                    enabled = !busy,
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Become a creator") }
             }
         }
 
+        // Always reachable, even while loading or after an error.
         OutlinedButton(onClick = onSignOut, modifier = Modifier.fillMaxWidth()) {
             Text("Sign out")
         }
@@ -129,16 +136,15 @@ fun HomeScreen(
 
     if (editingName) {
         var newName by remember { mutableStateOf(displayName) }
-        androidx.compose.material3.AlertDialog(
+        AlertDialog(
             onDismissRequest = { editingName = false },
             title = { Text("Edit display name") },
             text = {
-                androidx.compose.material3.OutlinedTextField(
-                    newName, { newName = it }, singleLine = true,
+                OutlinedTextField(newName, { newName = it }, singleLine = true,
                     label = { Text("Display name") })
             },
             confirmButton = {
-                androidx.compose.material3.TextButton(
+                TextButton(
                     enabled = newName.isNotBlank(),
                     onClick = {
                         val n = newName.trim()
@@ -155,7 +161,7 @@ fun HomeScreen(
                 ) { Text("Save") }
             },
             dismissButton = {
-                androidx.compose.material3.TextButton(onClick = { editingName = false }) { Text("Cancel") }
+                TextButton(onClick = { editingName = false }) { Text("Cancel") }
             }
         )
     }
