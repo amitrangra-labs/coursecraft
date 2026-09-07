@@ -19,7 +19,7 @@ data class LiveSession(
 /** Authenticated client for live-lecture endpoints (Phase 3.5). */
 object LiveApi {
 
-    private const val TIMEOUT_MS = 10000
+    private const val TIMEOUT_MS = 30000
 
     suspend fun listForCourse(token: String, courseId: String): List<LiveSession> {
         val arr = JSONArray(request("GET", "/api/courses/$courseId/live", token, null))

@@ -11,7 +11,7 @@ import java.net.URL
 /** Authenticated client for the assessment endpoints (Phase 3). */
 object AssessmentApi {
 
-    private const val TIMEOUT_MS = 10000
+    private const val TIMEOUT_MS = 30000
 
     suspend fun listForCourse(token: String, courseId: String): List<AssessmentSummary> {
         val arr = JSONArray(request("GET", "/api/courses/$courseId/assessments", token, null))

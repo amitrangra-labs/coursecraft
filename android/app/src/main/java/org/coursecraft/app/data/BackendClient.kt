@@ -12,7 +12,7 @@ import java.net.URL
  */
 object BackendClient {
 
-    private const val TIMEOUT_MS = 8000
+    private const val TIMEOUT_MS = 30000
 
     /** GET /api/health — returns the raw JSON body, or throws on failure. */
     suspend fun health(): String = get("/api/health", token = null)

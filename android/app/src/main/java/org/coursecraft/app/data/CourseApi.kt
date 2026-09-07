@@ -11,7 +11,7 @@ import java.net.URL
 /** Authenticated client for the backend course endpoints (Phase 1). */
 object CourseApi {
 
-    private const val TIMEOUT_MS = 10000
+    private const val TIMEOUT_MS = 30000
 
     suspend fun becomeCreator(token: String): String {
         val json = JSONObject(request("POST", "/api/creators", token, null))
