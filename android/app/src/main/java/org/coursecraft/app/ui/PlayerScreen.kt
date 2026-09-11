@@ -1,16 +1,28 @@
 package org.coursecraft.app.ui
 
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
@@ -21,8 +33,9 @@ import org.coursecraft.app.data.CourseApi
 
 /**
  * Plays a YouTube lecture and saves playback progress (journeys LJ-2/LJ-3). Resumes from the last
- * saved position, throttles position saves to ~every 10s, and marks the lecture complete near the
- * end (~95%). (YouTube video does not play in the Android emulator — verify on a device.)
+ * saved position, throttles saves to ~10s, and marks complete near the end (~95%). If the embedded
+ * player can't render on this device (old WebView, DRM/certification, embedding disabled), it
+ * degrades gracefully to an "Open in YouTube" button instead of a dead error.
  */
 @Composable
 fun PlayerScreen(
@@ -33,25 +46,48 @@ fun PlayerScreen(
     onBack: () -> Unit
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
+    var failed by remember { mutableStateOf(false) }
+
+    fun openInYouTube() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=$videoId"))
+        context.startActivity(intent)
+    }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Header(title, onBack)
+
         if (videoId.isBlank()) {
             Text("No video for this lecture.", color = MaterialTheme.colorScheme.error)
             return@Column
         }
+
+        if (failed) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    "This video can't play in the in-app player on this device.",
+                    textAlign = TextAlign.Center
+                )
+                Button(onClick = { openInYouTube() }) { Text("Open in YouTube") }
+            }
+            return@Column
+        }
+
         AndroidView(
             modifier = Modifier.fillMaxWidth(),
-            factory = { context ->
+            factory = { ctx ->
                 val io = CoroutineScope(Dispatchers.IO)
-                YouTubePlayerView(context).apply {
+                YouTubePlayerView(ctx).apply {
                     lifecycleOwner.lifecycle.addObserver(this)
                     addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                        private val trackProgress = lectureId.isNotBlank()
                         private var duration = 0f
                         private var lastSavedSec = -100
                         private var markedComplete = false
-
-                        private val trackProgress = lectureId.isNotBlank()
 
                         override fun onReady(youTubePlayer: YouTubePlayer) {
                             if (!trackProgress) {
@@ -66,6 +102,10 @@ fun PlayerScreen(
                                 }
                                 youTubePlayer.cueVideo(videoId, start)
                             }
+                        }
+
+                        override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
+                            failed = true
                         }
 
                         override fun onVideoDuration(youTubePlayer: YouTubePlayer, d: Float) {
@@ -83,7 +123,7 @@ fun PlayerScreen(
                                     try {
                                         CourseApi.saveProgress(accessToken, lectureId, sec, nearEnd)
                                     } catch (e: Exception) {
-                                        // best-effort; will retry on next tick
+                                        // best-effort
                                     }
                                 }
                             }
@@ -92,5 +132,10 @@ fun PlayerScreen(
                 }
             }
         )
+
+        // Always available, even when the embed does render — handy on any device.
+        TextButton(onClick = { openInYouTube() }, modifier = Modifier.padding(top = 8.dp)) {
+            Text("Open in YouTube ↗")
+        }
     }
 }
