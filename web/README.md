@@ -10,17 +10,22 @@ cd web && python3 -m http.server 5173   # then open http://localhost:5173
 ```
 (The backend allows any origin via CORS, so local files work too.)
 
-## Host it free — two options
+## Host it free — Cloudflare Pages (in use)
 
-### Option A — GitHub Pages (already wired)
-The [`web` workflow](../.github/workflows/web.yml) auto-deploys `web/` to GitHub Pages on every push.
-One-time: **repo Settings → Pages → Source: "GitHub Actions"**. Your site then lives at
-`https://amitrangra-labs.github.io/coursecraft/`.
+Live at **https://coursecraft.sweeeter.com**, served by Cloudflare Pages (unlimited bandwidth,
+free SSL).
 
-### Option B — Cloudflare Pages (unlimited bandwidth)
-In the Cloudflare dashboard: **Workers & Pages → Create → Pages → Connect to Git →** pick the repo.
-Set **Build command: (none)** and **Build output directory: `web`**. Deploys on every push, free,
-with a `*.pages.dev` URL (custom domain optional).
+To make pushes auto-deploy, the Pages project must be **connected to this Git repo**
+(not a Direct Upload project): in the Cloudflare dashboard go to **Workers & Pages → the
+`coursecraft` project → Settings → Builds & deployments → Connect to Git**, pick the repo, then set:
+- Production branch: `main`
+- Build command: *(empty)*
+- Build output directory: `web`
+
+After that it rebuilds on every `git push`. For a one-off manual deploy instead:
+```bash
+npx wrangler pages deploy web --project-name=coursecraft
+```
 
 ## Config
 The backend/Supabase URLs and the (public) Supabase publishable key are constants at the top of
