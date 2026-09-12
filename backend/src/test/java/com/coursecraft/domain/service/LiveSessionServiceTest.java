@@ -49,6 +49,15 @@ class LiveSessionServiceTest {
     }
 
     @Test
+    void keepsSelfHostedStreamUrlAsIs() {
+        User creator = user(Role.CREATOR);
+        Course c = courseService.createCourse(creator, "Algebra", "Math", "Beginner");
+        String hls = "https://live.example.org/hls/lecture.m3u8";
+        LiveSession s = live.schedule(creator, c.id(), "In-house live", hls, Instant.now());
+        assertEquals(hls, s.youtubeVideoId());
+    }
+
+    @Test
     void rejectsBadVideoRef() {
         User creator = user(Role.CREATOR);
         Course c = courseService.createCourse(creator, "Algebra", "Math", "Beginner");

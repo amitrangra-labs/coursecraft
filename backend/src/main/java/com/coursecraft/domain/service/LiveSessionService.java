@@ -37,7 +37,7 @@ public final class LiveSessionService {
         if (title == null || title.isBlank()) {
             throw new ValidationException("title is required");
         }
-        String videoId = normalizeYoutube(rawVideoRef);
+        String videoId = normalizeVideoRef(rawVideoRef);
         Instant start = startsAt == null ? Instant.now() : startsAt;
         return store.insert(new LiveSession(UUID.randomUUID(), courseId, title.trim(), videoId,
                 LiveStatus.SCHEDULED, start, null));
@@ -95,9 +95,14 @@ public final class LiveSessionService {
         }
     }
 
-    private static String normalizeYoutube(String raw) {
+    /**
+     * A live session's video ref is either a YouTube (Live) id/URL — normalized to its 11-char id —
+     * or a self-hosted stream URL (e.g. an HLS {@code .m3u8} or MP4 from your own Owncast/CDN), which
+     * is stored and played back as-is. The player branches on {@code http(s)://} vs. a bare id.
+     */
+    private static String normalizeVideoRef(String raw) {
         if (raw == null || raw.isBlank()) {
-            throw new ValidationException("YouTube video id or URL is required");
+            throw new ValidationException("A YouTube id/URL or a stream URL is required");
         }
         String trimmed = raw.trim();
         Matcher m = YOUTUBE.matcher(trimmed);
@@ -107,6 +112,9 @@ public final class LiveSessionService {
         if (trimmed.matches("[A-Za-z0-9_-]{11}")) {
             return trimmed;
         }
-        throw new ValidationException("Not a valid YouTube video id or URL");
+        if (trimmed.matches("(?i)^https?://\\S+")) {
+            return trimmed;
+        }
+        throw new ValidationException("Not a valid YouTube id/URL or stream URL");
     }
 }

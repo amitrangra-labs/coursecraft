@@ -28,7 +28,7 @@ public final class LiveHandler {
         Instant startsAt = body.startsAtEpochMs() == null ? Instant.now()
                 : Instant.ofEpochMilli(body.startsAtEpochMs());
         LiveSession s = liveService.schedule(user, uuid(request, "courseId"),
-                body.title(), body.youtubeVideoId(), startsAt);
+                body.title(), body.videoRef(), startsAt);
         return ServerResponse.ok().body(LiveView.from(s));
     }
 
@@ -66,7 +66,8 @@ public final class LiveHandler {
         return UUID.fromString(request.pathVariable(name));
     }
 
-    public record ScheduleRequest(String title, String youtubeVideoId, Long startsAtEpochMs) {
+    /** {@code videoRef} is a YouTube (Live) id/URL or a self-hosted stream URL (HLS {@code .m3u8}/MP4). */
+    public record ScheduleRequest(String title, String videoRef, Long startsAtEpochMs) {
     }
 
     public record LiveView(String id, String title, String videoId, String status, long startsAtEpochMs) {
