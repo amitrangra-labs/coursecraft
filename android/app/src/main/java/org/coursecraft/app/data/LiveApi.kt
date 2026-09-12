@@ -33,7 +33,7 @@ object LiveApi {
     }
 
     suspend fun schedule(token: String, courseId: String, title: String, videoId: String, startsAtEpochMs: Long): LiveSession {
-        val body = JSONObject().put("title", title).put("youtubeVideoId", videoId).put("startsAtEpochMs", startsAtEpochMs)
+        val body = JSONObject().put("title", title).put("videoRef", videoId).put("startsAtEpochMs", startsAtEpochMs)
         return parse(JSONObject(request("POST", "/api/courses/$courseId/live", token, body)))
     }
 

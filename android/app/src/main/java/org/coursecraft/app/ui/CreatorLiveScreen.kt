@@ -93,7 +93,8 @@ fun CreatorLiveScreen(
 
         OutlinedTextField(newTitle, { newTitle = it }, label = { Text("Session title") },
             singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(videoId, { videoId = it }, label = { Text("YouTube (Live) id or URL") },
+        OutlinedTextField(videoId, { videoId = it },
+            label = { Text("YouTube (Live) id/URL or stream URL (.m3u8 / .mp4)") },
             singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedButton(onClick = { pickDateTime() }, modifier = Modifier.fillMaxWidth()) {
             Text("Starts: ${SimpleDateFormat("EEE, MMM d yyyy · HH:mm", Locale.getDefault()).format(Date(startsAt))}")
