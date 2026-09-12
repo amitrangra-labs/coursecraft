@@ -28,6 +28,8 @@ import kotlinx.coroutines.launch
 import org.coursecraft.app.data.BackendClient
 import org.coursecraft.app.data.ContinueItem
 import org.coursecraft.app.data.CourseApi
+import org.coursecraft.app.data.LiveApi
+import org.coursecraft.app.data.LiveSession
 import org.json.JSONObject
 
 /**
@@ -46,6 +48,7 @@ fun HomeScreen(
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var continueItem by remember { mutableStateOf<ContinueItem?>(null) }
+    var liveNow by remember { mutableStateOf<List<LiveSession>>(emptyList()) }
     var editingName by remember { mutableStateOf(false) }
 
     LaunchedEffect(accessToken) {
@@ -67,6 +70,11 @@ fun HomeScreen(
         } catch (e: Exception) {
             null
         }
+        liveNow = try {
+            LiveApi.liveNow(accessToken)
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     Column(
@@ -82,6 +90,16 @@ fun HomeScreen(
             Text("Hi, ${displayName.ifBlank { "there" }}", style = MaterialTheme.typography.headlineSmall)
             role?.let { Text("Role: $it", style = MaterialTheme.typography.bodyMedium) }
             TextButton(onClick = { editingName = true }) { Text("Edit name") }
+
+            if (liveNow.isNotEmpty()) {
+                Text("🔴 Live now", style = MaterialTheme.typography.titleMedium)
+                liveNow.forEach { s ->
+                    Button(
+                        onClick = { onNavigate(Screen.Player(s.videoId, s.title, "")) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("Join: ${s.title}") }
+                }
+            }
 
             continueItem?.let { c ->
                 Button(

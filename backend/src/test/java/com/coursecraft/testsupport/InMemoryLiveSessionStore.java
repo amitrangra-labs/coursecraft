@@ -35,6 +35,11 @@ public final class InMemoryLiveSessionStore implements LiveSessionStore {
     }
 
     @Override
+    public List<LiveSession> listLiveInPublishedCourses() {
+        return sessions.values().stream().filter(s -> s.status() == LiveStatus.LIVE).toList();
+    }
+
+    @Override
     public void updateStatus(UUID id, LiveStatus status) {
         LiveSession s = sessions.get(id);
         sessions.put(id, new LiveSession(s.id(), s.courseId(), s.title(), s.youtubeVideoId(),

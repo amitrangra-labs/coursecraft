@@ -26,6 +26,12 @@ object LiveApi {
         return (0 until arr.length()).map { parse(arr.getJSONObject(it)) }
     }
 
+    /** All currently-LIVE sessions across published courses (for the Home "Live now" rail). */
+    suspend fun liveNow(token: String): List<LiveSession> {
+        val arr = JSONArray(request("GET", "/api/live/now", token, null))
+        return (0 until arr.length()).map { parse(arr.getJSONObject(it)) }
+    }
+
     suspend fun schedule(token: String, courseId: String, title: String, videoId: String, startsAtEpochMs: Long): LiveSession {
         val body = JSONObject().put("title", title).put("youtubeVideoId", videoId).put("startsAtEpochMs", startsAtEpochMs)
         return parse(JSONObject(request("POST", "/api/courses/$courseId/live", token, body)))

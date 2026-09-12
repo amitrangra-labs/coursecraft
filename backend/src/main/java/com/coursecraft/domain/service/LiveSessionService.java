@@ -60,6 +60,11 @@ public final class LiveSessionService {
         return store.listByCourse(courseId);
     }
 
+    /** Global "Live now": all LIVE sessions in published courses (any signed-in user). */
+    public List<LiveSession> liveNow() {
+        return store.listLiveInPublishedCourses();
+    }
+
     // --- helpers ---
 
     private LiveSession transition(User creator, UUID sessionId, LiveStatus status) {

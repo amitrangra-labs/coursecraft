@@ -54,6 +54,18 @@ public final class JdbcLiveSessionStore implements LiveSessionStore {
     }
 
     @Override
+    public List<LiveSession> listLiveInPublishedCourses() {
+        return jdbc.sql("""
+                        SELECT s.id, s.course_id, s.title, s.youtube_video_id, s.status, s.starts_at, s.created_at
+                        FROM live_session s
+                        JOIN course c ON c.id = s.course_id
+                        WHERE s.status = 'LIVE' AND c.status = 'PUBLISHED'
+                        ORDER BY s.starts_at DESC
+                        """)
+                .query(JdbcLiveSessionStore::map).list();
+    }
+
+    @Override
     public void updateStatus(UUID id, LiveStatus status) {
         jdbc.sql("UPDATE live_session SET status = :status WHERE id = :id")
                 .param("status", status.name()).param("id", id).update();

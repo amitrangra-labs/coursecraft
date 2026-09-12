@@ -1,5 +1,7 @@
 package org.coursecraft.app.ui
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,10 +24,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.coursecraft.app.data.LiveApi
 import org.coursecraft.app.data.LiveSession
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 /** Creator: schedule and run live lectures (journey CJ-7). */
 @Composable
@@ -37,12 +44,27 @@ fun CreatorLiveScreen(
     onBack: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var sessions by remember { mutableStateOf<List<LiveSession>>(emptyList()) }
     var reloadKey by remember { mutableStateOf(0) }
     var newTitle by remember { mutableStateOf("") }
     var videoId by remember { mutableStateOf("") }
-    var minutes by remember { mutableStateOf("0") }
+    var startsAt by remember { mutableStateOf(System.currentTimeMillis() + 3_600_000L) }
     var error by remember { mutableStateOf<String?>(null) }
+
+    fun pickDateTime() {
+        val cal = Calendar.getInstance().apply { timeInMillis = startsAt }
+        DatePickerDialog(context, { _, y, mo, d ->
+            val picked = Calendar.getInstance().apply {
+                timeInMillis = startsAt
+                set(Calendar.YEAR, y); set(Calendar.MONTH, mo); set(Calendar.DAY_OF_MONTH, d)
+            }
+            TimePickerDialog(context, { _, h, mi ->
+                picked.set(Calendar.HOUR_OF_DAY, h); picked.set(Calendar.MINUTE, mi); picked.set(Calendar.SECOND, 0)
+                startsAt = picked.timeInMillis
+            }, picked.get(Calendar.HOUR_OF_DAY), picked.get(Calendar.MINUTE), false).show()
+        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+    }
 
     LaunchedEffect(reloadKey) {
         try {
@@ -73,14 +95,17 @@ fun CreatorLiveScreen(
             singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(videoId, { videoId = it }, label = { Text("YouTube (Live) id or URL") },
             singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(minutes, { minutes = it.filter { c -> c.isDigit() } },
-            label = { Text("Starts in (minutes from now)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedButton(onClick = { pickDateTime() }, modifier = Modifier.fillMaxWidth()) {
+            Text("Starts: ${SimpleDateFormat("EEE, MMM d yyyy · HH:mm", Locale.getDefault()).format(Date(startsAt))}")
+        }
         Button(
             onClick = {
                 val t = newTitle.trim(); val v = videoId.trim()
                 if (t.isNotEmpty() && v.isNotEmpty()) {
-                    val startsAt = System.currentTimeMillis() + (minutes.toLongOrNull() ?: 0L) * 60_000L
-                    run { LiveApi.schedule(accessToken, courseId, t, v, startsAt); newTitle = ""; videoId = ""; minutes = "0" }
+                    run {
+                        LiveApi.schedule(accessToken, courseId, t, v, startsAt)
+                        newTitle = ""; videoId = ""; startsAt = System.currentTimeMillis() + 3_600_000L
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()

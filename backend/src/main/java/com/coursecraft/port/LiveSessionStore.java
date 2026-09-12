@@ -16,5 +16,8 @@ public interface LiveSessionStore {
 
     List<LiveSession> listByCourse(UUID courseId);
 
+    /** All currently-LIVE sessions in published courses (for a global "Live now" list). */
+    List<LiveSession> listLiveInPublishedCourses();
+
     void updateStatus(UUID id, LiveStatus status);
 }

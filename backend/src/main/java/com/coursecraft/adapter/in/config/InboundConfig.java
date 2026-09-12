@@ -19,8 +19,13 @@ import com.coursecraft.domain.service.ProgressService;
 import com.coursecraft.port.TokenVerifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
+
+import java.util.List;
 
 import static org.springframework.web.servlet.function.RequestPredicates.DELETE;
 import static org.springframework.web.servlet.function.RequestPredicates.GET;
@@ -36,6 +41,22 @@ import static org.springframework.web.servlet.function.RouterFunctions.route;
  */
 @Configuration(proxyBeanMethods = false)
 public class InboundConfig {
+
+    /**
+     * CORS for the web client. The API is stateless and token-authenticated (Bearer header, no
+     * cookies), so any origin is allowed. Runs as a servlet filter, handling preflight before the
+     * functional routes.
+     */
+    @Bean
+    CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
 
     @Bean
     HealthHandler healthHandler() {
@@ -124,6 +145,7 @@ public class InboundConfig {
                 .andRoute(GET("/api/courses/{courseId}/progress"), progressHandler::courseProgress)
                 // live lectures (CJ-7, LJ-7)
                 .andRoute(POST("/api/courses/{courseId}/live"), liveHandler::schedule)
+                .andRoute(GET("/api/live/now"), liveHandler::liveNow)
                 .andRoute(GET("/api/courses/{courseId}/live"), liveHandler::listForCourse)
                 .andRoute(POST("/api/live/{sessionId}/start"), liveHandler::goLive)
                 .andRoute(POST("/api/live/{sessionId}/end"), liveHandler::end)

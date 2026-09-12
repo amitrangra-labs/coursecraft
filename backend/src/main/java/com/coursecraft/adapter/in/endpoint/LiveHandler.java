@@ -53,6 +53,11 @@ public final class LiveHandler {
                 .stream().map(LiveView::from).toList());
     }
 
+    public ServerResponse liveNow(ServerRequest request) {
+        currentUser(request);
+        return ServerResponse.ok().body(liveService.liveNow().stream().map(LiveView::from).toList());
+    }
+
     private User currentUser(ServerRequest request) {
         return profileService.getOrProvision(RequestAuth.tokenOf(request));
     }
