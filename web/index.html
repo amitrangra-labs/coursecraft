@@ -11,6 +11,8 @@
   header { background:var(--p); color:#fff; padding:12px 16px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:5; }
   header b { font-size:18px; } header .sp { flex:1; }
   header button { background:rgba(255,255,255,.18); color:#fff; border:0; }
+  header a.hlink { color:#fff; text-decoration:none; font-size:14px; padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.18); }
+  header a.hlink:hover { background:rgba(255,255,255,.3); }
   main { max-width:760px; margin:0 auto; padding:16px; }
   h2 { margin:14px 0 8px; } h3 { margin:14px 0 6px; }
   .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:10px 0; }
@@ -33,7 +35,7 @@
 </style>
 </head>
 <body>
-<header><b>CourseCraft</b><span class="sp"></span><span id="who" class="muted" style="color:#fff"></span><button id="signout" style="display:none">Sign out</button></header>
+<header><b>CourseCraft</b><span class="sp"></span><span id="who" class="muted" style="color:#fff"></span><a href="guide.html" target="_blank" class="hlink">Help</a><button id="signout" style="display:none">Sign out</button></header>
 <main id="app">Loading…</main>
 
 <script>

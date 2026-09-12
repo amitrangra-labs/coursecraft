@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CourseCraft — User Guide</title>
+<style>
+  :root { --p:#5b4bd6; --p2:#7a6cf0; --bg:#faf8ff; --card:#fff; --line:#e6e1f5; --muted:#6b6680; --ink:#1c1830; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#141221; --card:#1e1b2e; --line:#2f2a44; --muted:#a8a2bd; --ink:#f2f0fa; --p2:#9a8dff; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:linear-gradient(135deg,var(--p),var(--p2)); color:#fff; padding:28px 20px; }
+  header .wrap { max-width:820px; margin:0 auto; }
+  header h1 { margin:0 0 4px; font-size:26px; }
+  header p { margin:0; opacity:.92; }
+  header .actions { margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+  a.btn { display:inline-block; background:rgba(255,255,255,.18); color:#fff; text-decoration:none; padding:9px 16px; border-radius:999px; font-weight:600; border:1px solid rgba(255,255,255,.35); }
+  a.btn.solid { background:#fff; color:var(--p); border-color:#fff; }
+  main { max-width:820px; margin:0 auto; padding:20px; }
+  nav.toc { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin:18px 0 8px; }
+  nav.toc b { display:block; margin-bottom:6px; color:var(--muted); font-size:13px; text-transform:uppercase; letter-spacing:.05em; }
+  nav.toc a { color:var(--p2); text-decoration:none; }
+  nav.toc a:hover { text-decoration:underline; }
+  nav.toc ul { margin:6px 0 0; padding-left:18px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px 22px; margin:16px 0; }
+  h2 { margin:6px 0 4px; font-size:22px; display:flex; align-items:center; gap:10px; }
+  h2 .tag { font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px; background:rgba(123,108,240,.15); color:var(--p2); }
+  h3 { margin:22px 0 6px; font-size:17px; }
+  ol, ul { margin:8px 0; padding-left:22px; }
+  li { margin:5px 0; }
+  .lead { color:var(--muted); margin:2px 0 10px; }
+  .note { border-left:3px solid var(--p2); background:rgba(123,108,240,.07); padding:10px 14px; border-radius:8px; margin:12px 0; font-size:15px; }
+  .kbd { background:rgba(123,108,240,.14); color:var(--p2); border-radius:6px; padding:1px 7px; font-weight:600; font-size:14px; white-space:nowrap; }
+  code { background:rgba(123,108,240,.12); padding:1px 6px; border-radius:6px; font-size:14px; }
+  footer { max-width:820px; margin:10px auto 40px; padding:0 20px; color:var(--muted); font-size:14px; }
+  footer a { color:var(--p2); }
+  hr { border:0; border-top:1px solid var(--line); margin:22px 0; }
+  .top { display:inline-block; margin-top:10px; font-size:13px; color:var(--muted); text-decoration:none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>📚 CourseCraft — User Guide</h1>
+    <p>Everything you can do as a learner and as a creator.</p>
+    <div class="actions">
+      <a class="btn solid" href="./index.html">Open the app →</a>
+      <a class="btn" href="https://coursecraft.sweeeter.com">coursecraft.sweeeter.com</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <nav class="toc" id="top">
+    <b>On this page</b>
+    <ul>
+      <li><a href="#start">Getting started (sign in)</a></li>
+      <li><a href="#learner">For learners</a> — browse, enroll, watch, quizzes, live</li>
+      <li><a href="#creator">For creators</a> — courses, videos, quizzes, live, analytics</li>
+      <li><a href="#video">Video options</a> — YouTube vs. self-hosted</li>
+      <li><a href="#faq">Tips &amp; troubleshooting</a></li>
+    </ul>
+  </nav>
+
+  <section id="start">
+    <h2>🚀 Getting started</h2>
+    <p class="lead">CourseCraft works two ways — pick whichever suits you.</p>
+    <h3>On the web (nothing to install)</h3>
+    <ol>
+      <li>Open <a href="https://coursecraft.sweeeter.com">coursecraft.sweeeter.com</a> in any browser.</li>
+      <li>Tap <span class="kbd">Create account</span>, enter an email and a password (6+ characters). You're in.</li>
+      <li>Already have an account? Enter your email and password and tap <span class="kbd">Sign in</span>.</li>
+    </ol>
+    <h3>On Android (the app)</h3>
+    <ol>
+      <li>On your phone, open the download link your host shared and tap the file to install.</li>
+      <li>If Android warns about "unknown sources," tap <span class="kbd">Settings → Allow</span>, then <span class="kbd">Install</span>.</li>
+      <li>Open <b>CourseCraft</b> and sign in (or create an account) — same as the web.</li>
+    </ol>
+    <div class="note">Everyone starts as a <b>learner</b>. You can switch on creator tools any time — see <a href="#become">Become a creator</a>.</div>
+    <a class="top" href="#top">↑ Back to top</a>
+  </section>
+
+  <section id="learner">
+    <h2>🎓 For learners <span class="tag">watch &amp; learn</span></h2>
+    <p class="lead">Find a course, watch the lectures, and test yourself.</p>
+
+    <h3>Browse and enroll</h3>
+    <ol>
+      <li>From the home screen, tap <span class="kbd">Browse courses</span>.</li>
+      <li>Tap any course to see its lessons.</li>
+      <li>Tap <span class="kbd">Enroll</span> to add it to your <b>My Learning</b> list. (Tap again to unenroll.)</li>
+    </ol>
+
+    <h3>Watch lectures</h3>
+    <ol>
+      <li>Inside a course, tap a lecture (marked <b>▶</b>) to play it.</li>
+      <li>Your position is saved automatically — come back later and it resumes where you left off.</li>
+      <li>On the home screen, <span class="kbd">▶ Continue</span> jumps straight back to your last lecture.</li>
+    </ol>
+    <div class="note">If a YouTube video won't play on an older phone, tap <span class="kbd">Open in new tab</span> / <span class="kbd">Open in YouTube</span>. Self-hosted videos play in the app on any device.</div>
+
+    <h3>Take assessments &amp; see leaderboards</h3>
+    <ol>
+      <li>In a course, tap <span class="kbd">Assessments &amp; leaderboards</span>.</li>
+      <li>Tap <span class="kbd">Take</span>, answer the questions, and tap <span class="kbd">Submit</span> — it's graded instantly.</li>
+      <li>You'll see your score and whether you passed. Retake to improve — your best score counts.</li>
+      <li>Tap <span class="kbd">Leaderboard</span> to see the top scorers.</li>
+    </ol>
+
+    <h3>Join a live session</h3>
+    <ol>
+      <li>When a class is live, a <b>🔴 Live now</b> banner appears on the home screen — tap <span class="kbd">Join</span>.</li>
+      <li>Or open a course → <span class="kbd">Live sessions</span> → <span class="kbd">Join</span> (live) or <span class="kbd">Watch recording</span> (after it ends).</li>
+    </ol>
+    <a class="top" href="#top">↑ Back to top</a>
+  </section>
+
+  <section id="creator">
+    <h2>🧑‍🏫 For creators <span class="tag">teach</span></h2>
+    <p class="lead">Build a course from video lessons and quizzes, then publish it and even teach live.</p>
+
+    <h3 id="become">Become a creator</h3>
+    <ol>
+      <li>On the home screen, tap <span class="kbd">Become a creator</span>. That's it — creator tools appear.</li>
+    </ol>
+
+    <h3>Create a course</h3>
+    <ol>
+      <li>Tap <span class="kbd">Create a course</span>, enter a title (subject and level are optional), tap <span class="kbd">Create</span>.</li>
+      <li>You're taken to the course's <b>Manage</b> screen.</li>
+    </ol>
+
+    <h3>Add lessons</h3>
+    <ol>
+      <li>Add a <b>section</b> (e.g. "Getting Started") — type a title and tap <span class="kbd">Add section</span>.</li>
+      <li>Under a section, add a <b>lecture</b>: enter a title and a video (see <a href="#video">Video options</a>), tap <span class="kbd">Add video lecture</span>.</li>
+      <li>Repeat to build out your course.</li>
+    </ol>
+
+    <h3>Add a quiz (assessment)</h3>
+    <ol>
+      <li>On the Manage screen tap <span class="kbd">Assessments</span> → enter a title and a pass mark (%) → <span class="kbd">Create assessment</span>.</li>
+      <li>Tap <span class="kbd">Add question</span>. Type the question, pick a type (single choice, multiple, or true/false), set points.</li>
+      <li>Fill in the options and tick the <b>correct</b> one(s). Tap <span class="kbd">Add question</span>. Repeat.</li>
+    </ol>
+
+    <h3>Publish</h3>
+    <ol>
+      <li>When ready, tap <span class="kbd">Publish course</span>. Published courses appear in the catalog for learners to enroll.</li>
+    </ol>
+
+    <h3>Host a live session</h3>
+    <ol>
+      <li>On the Manage screen tap <span class="kbd">Live sessions</span>.</li>
+      <li>Enter a session title, a <b>video link</b> (a YouTube Live link, or your own stream URL — see <a href="#video">below</a>), and a start date/time. Tap <span class="kbd">Schedule</span>.</li>
+      <li>When it's time, tap <span class="kbd">Go live</span> — learners can now join. Tap <span class="kbd">End</span> when finished; the recording is saved automatically as a replay.</li>
+    </ol>
+
+    <h3>See how you're doing</h3>
+    <ol>
+      <li>Tap <span class="kbd">Analytics</span> for enrollment counts and, per quiz, the number of attempts and the average score.</li>
+    </ol>
+    <a class="top" href="#top">↑ Back to top</a>
+  </section>
+
+  <section id="video">
+    <h2>🎬 Video options</h2>
+    <p class="lead">When adding a lecture or scheduling a live session, the video field accepts either of these:</p>
+    <ul>
+      <li><b>YouTube</b> — paste a YouTube video ID or full link (for live, a YouTube Live link). Free and easy; best on modern devices.</li>
+      <li><b>Self-hosted</b> — paste a direct <code>.mp4</code> link or an <code>.m3u8</code> (HLS) stream URL from your own storage or live server. These play right inside the app on <b>any</b> device, including older phones where YouTube may not.</li>
+    </ul>
+    <div class="note">Self-hosting keeps everything in-house at no cost — e.g. a free stream server for live, or free file storage for recorded lessons. Ask your administrator for the stream/file URL to paste in.</div>
+    <a class="top" href="#top">↑ Back to top</a>
+  </section>
+
+  <section id="faq">
+    <h2>💡 Tips &amp; troubleshooting</h2>
+    <ul>
+      <li><b>Sent back to the sign-in screen?</b> The app may have been idle a while — just sign in again.</li>
+      <li><b>A video won't play?</b> Use <span class="kbd">Open in new tab</span> / <span class="kbd">Open in YouTube</span>, or ask the creator for a self-hosted version.</li>
+      <li><b>Moving around:</b> every screen has <span class="kbd">← Back</span> (previous screen) and <span class="kbd">⌂ Home</span> at the top.</li>
+      <li><b>Change your name:</b> tap <span class="kbd">Edit name</span> on the home screen — it's what shows on leaderboards.</li>
+      <li><b>Web or app?</b> Both share the same account and data — sign in on either.</li>
+    </ul>
+    <a class="top" href="#top">↑ Back to top</a>
+  </section>
+</main>
+
+<footer>
+  <hr>
+  CourseCraft — a free education platform. <a href="./index.html">Open the app</a> ·
+  <a href="https://coursecraft.sweeeter.com">coursecraft.sweeeter.com</a>
+</footer>
+</body>
+</html>

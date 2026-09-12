@@ -1,5 +1,7 @@
 package org.coursecraft.app.ui
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -43,6 +46,7 @@ fun HomeScreen(
     onNavigate: (Screen) -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var displayName by remember { mutableStateOf("") }
     var role by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -143,6 +147,11 @@ fun HomeScreen(
         }
 
         // Always reachable, even while loading or after an error.
+        TextButton(onClick = {
+            context.startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://coursecraft.sweeeter.com/guide.html"))
+            )
+        }) { Text("Help & guide") }
         OutlinedButton(onClick = onSignOut, modifier = Modifier.fillMaxWidth()) {
             Text("Sign out")
         }
