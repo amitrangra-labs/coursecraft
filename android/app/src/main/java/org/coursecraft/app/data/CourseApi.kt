@@ -28,12 +28,19 @@ object CourseApi {
         return parseSection(JSONObject(request("POST", "/api/courses/$courseId/sections", token, body)))
     }
 
+    /** A direct video URL (not a YouTube link) is stored as a native-playable "mp4" lecture. */
+    fun videoProviderFor(ref: String): String {
+        val r = ref.trim().lowercase()
+        val isYoutube = r.contains("youtube.com") || r.contains("youtu.be")
+        return if (r.startsWith("http") && !isYoutube) "mp4" else "youtube"
+    }
+
     suspend fun addLecture(
         token: String, courseId: String, sectionId: String, title: String, videoId: String
     ): LectureView {
         val body = JSONObject()
             .put("title", title)
-            .put("videoProvider", "youtube")
+            .put("videoProvider", videoProviderFor(videoId))
             .put("videoId", videoId)
         val path = "/api/courses/$courseId/sections/$sectionId/lectures"
         return parseLecture(JSONObject(request("POST", path, token, body)))
@@ -71,7 +78,8 @@ object CourseApi {
     suspend fun updateLecture(
         token: String, courseId: String, sectionId: String, lectureId: String, title: String, videoId: String
     ) {
-        val body = JSONObject().put("title", title).put("videoProvider", "youtube").put("videoId", videoId)
+        val body = JSONObject().put("title", title)
+            .put("videoProvider", videoProviderFor(videoId)).put("videoId", videoId)
         request("PUT", "/api/courses/$courseId/sections/$sectionId/lectures/$lectureId", token, body)
     }
 

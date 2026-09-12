@@ -140,7 +140,7 @@ fun ManageCourseScreen(
                         OutlinedTextField(lectureTitle[section.id] ?: "", { lectureTitle[section.id] = it },
                             label = { Text("Lecture title") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                         OutlinedTextField(lectureVideo[section.id] ?: "", { lectureVideo[section.id] = it },
-                            label = { Text("YouTube id or URL") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                            label = { Text("YouTube id/URL, or MP4/HLS link") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                         OutlinedButton(
                             onClick = {
                                 val lt = (lectureTitle[section.id] ?: "").trim()
@@ -189,7 +189,7 @@ fun ManageCourseScreen(
             onDismiss = { editing = null }
         )
         is Editing.LectureEdit -> TwoFieldDialog(
-            "Edit lecture", "Title", e.title, "YouTube id or URL", e.video,
+            "Edit lecture", "Title", e.title, "YouTube id/URL, or MP4/HLS link", e.video,
             onSave = { t, v -> editing = null; submit { CourseApi.updateLecture(accessToken, courseId, e.sectionId, e.id, t, v) } },
             onDismiss = { editing = null }
         )
